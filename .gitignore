@@ -1,0 +1,4 @@
+*.pyc
+code/images/.DS_Store
+code/testImage.npy
+.DS_Store
