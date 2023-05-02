@@ -17,7 +17,7 @@ y_val_oxygen = oxygen_coef[:,1]
 y_val_carbon = carbon_coef[:,1]
 y_val_hydrogen = hydrogen_coef[:,1]
 
-xinterp = np.linspace(min(x_val_oxygen), max(x_val_oxygen), 100)
+xinterp = np.linspace(min(x_val_oxygen), max(x_val_oxygen), 1000)
 yinterp_wood = wood_composite[0]*np.interp(xinterp, x_val_carbon, y_val_carbon)+wood_composite[1]*np.interp(xinterp, x_val_hydrogen, y_val_hydrogen)+wood_composite[2]*np.interp(xinterp, x_val_oxygen, y_val_oxygen)
 
 
@@ -41,16 +41,12 @@ diff_coef = np.abs(yinterp_bismuth-yinterp_iron)
 plt.figure(1)
 #plt.plot(np.log(x_val_bismuth), np.log(y_val_bismuth), 'o')
 #plt.plot(np.log(x_val_iron), (y_val_iron), 'o')
-plt.plot(np.log(xinterp), yinterp_bismuth, '-x')
+plt.plot(np.log(xinterp),yinterp_bismuth, '-x')
 plt.plot(np.log(xinterp),yinterp_iron, '-x')
 plt.plot(np.log(xinterp),yinterp_wood,'-x')
 
 plt.legend(["Bismuth", "Iron", "Wood"])
 
 plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
-
-
-plt.figure(2)
-plt.plot(np.log(xinterp),diff_coef)
 
 plt.show()

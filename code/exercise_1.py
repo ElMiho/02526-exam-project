@@ -6,6 +6,7 @@ import skimage as ski
 from scipy import linalg
 from tqdm import tqdm
 import time
+import cvxpy as cp
 
 def add_noise_float(b, mean_noise, std_noise):
     return b + np.random.normal(loc=mean_noise, scale=std_noise, size=b.shape)
@@ -127,13 +128,11 @@ for down_scaling_factor in tqdm(down_sampling_factors):
                     noise_b = add_noise_percent(b, 0, std_p)
                     noise_picture, _, _, _ = linalg.lstsq(A, noise_b)
                     noise_picture = np.reshape(noise_picture, (N, N), order="F")
-
-
                     plt.imshow(noise_picture)
                 
                 print(f"Time taken for plotting: {time.time() - start_time:.4f}s")
                 plt.suptitle(f"N={N}, cond={condA}, theta_shape={theta.shape}, p={p_val}, d={round(d_val,4)}, down_scaling_factor={down_scaling_factor}, index={index}", fontsize=12)
-                plt.savefig(f"./images/N={N}, theta_shape={theta.shape}, p={p_val}, d={round(d_val,4)}, down_scaling_factor={down_scaling_factor}, index={index}.png")
+                plt.savefig(f"./images/N={N}, cond={condA}, theta_shape={theta.shape}, p={p_val}, d={round(d_val,4)}, down_scaling_factor={down_scaling_factor}, index={index}.png")
                 
                 break
             break
