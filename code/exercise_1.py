@@ -14,6 +14,48 @@ def add_noise_float(b, mean_noise, std_noise):
 def add_noise_percent(b, mean_percent=50, std_percent=70):
     return add_noise_float(b, np.mean(b)*mean_percent/100, np.mean(b)*std_percent/100)
 
+def threshold(image, color='gray'):
+    '''Expects image to be a numpy array, shape: (N,N)
+    Returns a numpy array, shape: (N,N) if color == 'gray'
+    Returns a numpy array, shape: (N,N,3) if color == 'rgb'''
+    '''Color map is either rgb or gray'''
+    truncations = [0, 157, 174, 440] #Estimate of the mean values of the colors (in grayscale) (This process can be automated)
+    mean_truncation = [(truncations[i]+truncations[i+1])/2 for i in range(len(truncations)-1)]
+    index = 0 
+    if color == 'rgb':
+        mean_truncation = [i/255 for i in mean_truncation]
+        imageRGB = np.zeros((image.shape[0], image.shape[1], 3))
+        colors = [[0,255,255], [255,0,0], [0,255,0], [255,255,0]] #cyan, red, green, yellow
+        for i in range(0,imageRGB.shape[2]):
+            imageRGB[:,:,i] = image[:,:]/255
+        pixels = []
+           
+        for i in range(len(mean_truncation)-1):
+            pixels.append(np.where((imageRGB > mean_truncation[i]) & (imageRGB < mean_truncation[i+1])))
+            print(mean_truncation[i], mean_truncation[i+1])
+
+        #edge cases
+        pixels.append(np.where(imageRGB < mean_truncation[0]))
+        pixels.append(np.where(imageRGB > mean_truncation[-1]))
+        for pixel in pixels:
+            imageRGB[pixel[0],pixel[1],:] = colors[index]
+            index+=1
+        return imageRGB
+
+    elif color == 'gray':
+        colors = [100,170,0,255]
+        pixels = []
+        for i in range(len(mean_truncation)-1):
+            pixels.append(np.where((image > mean_truncation[i]) & (image < mean_truncation[i+1])))
+        #edge cases
+        pixels.append(np.where(image < mean_truncation[0]))
+        pixels.append(np.where(image > mean_truncation[-1]))
+
+        for pixel in pixels:
+            image[pixel[0],pixel[1]] = colors[index]
+            index+=1
+
+    return image
 
 testImage = np.load('testImage.npy')
 
