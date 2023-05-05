@@ -6,6 +6,7 @@ bismuth_coef = np.loadtxt('bismuth_data.txt')
 oxygen_coef = np.loadtxt('oxygen_data.txt')
 carbon_coef = np.loadtxt('carbon_data.txt')
 hydrogen_coef = np.loadtxt('hydrogen_data.txt')
+lead_coef = np.loadtxt('lead_data.txt')
 
 #Carbon, hydrogen, oxygen
 wood_composite = [0.5, 0.06, 0.44]
@@ -24,16 +25,19 @@ yinterp_wood = wood_composite[0]*np.interp(xinterp, x_val_carbon, y_val_carbon)+
 # Change from MeV to KeV
 x_val_iron = 1000*iron_coef[:,0]
 x_val_bismuth = 1000*bismuth_coef[:,0]
-
+x_val_lead = 1000 * lead_coef[:, 0]
 
 y_val_iron = iron_coef[:,1]
 y_val_bismuth = bismuth_coef[:,1]
+y_val_lead = lead_coef[:, 1]
 
 #Interpolate data
 
 yinterp_bismuth = np.interp(xinterp, x_val_bismuth, y_val_bismuth)
 
 yinterp_iron = np.interp(xinterp, x_val_iron, y_val_iron)
+
+yinterp_lead = np.interp(xinterp, x_val_lead, y_val_lead)
 
 diff_coef = np.abs(yinterp_bismuth-yinterp_iron)
 
@@ -44,8 +48,12 @@ plt.figure(1)
 plt.plot(np.log(xinterp),yinterp_bismuth, '-x')
 plt.plot(np.log(xinterp),yinterp_iron, '-x')
 plt.plot(np.log(xinterp),yinterp_wood,'-x')
+plt.plot(np.log(xinterp),yinterp_lead, '-x')
 
-plt.legend(["Bismuth", "Iron", "Wood"])
+plt.xlabel("Log X-Ray [KeV]")
+plt.ylabel("Attenuation coefficients [cm^2 / g]")
+
+plt.legend(["Bismuth", "Iron", "Wood", "Lead"])
 
 plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
 
