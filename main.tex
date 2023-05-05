@@ -12,6 +12,13 @@
 \usepackage{qtree}
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{color}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\usepackage{caption}
+
+\newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
+
 
 \definecolor{deepblue}{rgb}{0,0,0.5}
 \definecolor{deepred}{rgb}{0.6,0,0}
@@ -40,6 +47,8 @@
     showstringspaces = false,
 }
 
+\newcommand{\diff}[2]{\frac{\text{d} #1}{\text{d} #2}}
+
 \title{
     Look inside the forest \\
     \large X-ray and Computed Tomography
@@ -50,19 +59,261 @@
 \begin{document}
 \maketitle
 
+% ASSUMPTIONS
+%% Mean is normally distributed with mean = 0
+%% Tree is homogoen
+
 \section{Problem and background} 
+Due to hunting in forrests, shots are often found embedded in logs. This can impede the work of wood processing plants, as steel shots can discolour the wood and damage the saw blades. Therefore, one such plant, has reached out to us for guidance on designing a CT-scanner that can detect these shots before cutting the wood. \\
+As CT-scanners are expensive to operate, the wood processing company would like to use as few angles and as few rays as possible for the CT-scanner while also minimizing the time, the model takes to reconstruct the image.
+
 
 \section{Data and experiments}
+\subsection{Data - simulations}
+CT-scanners allow us to look inside objects, without cutting them open, by computing attenuation distributions over every angle used in the model and reconstruct the attenuation coefficients of the material from these distributions. This let's us identify compounds using the known attenuation coefficients of compounds we expect might be inside the object. \\ 
+How representative these distributions are of the actual object depends on the number of rays used by the CT-scanner, the number of angles, corresponding to the number of unique distributions, and the resolution used for the image. This is illustrated here for two orthogonal angles:
+
+% Kan man kigge på den her figur og vide hvad den visualisere på 3 sekunder? Hvordan kan den forbedres? 
+\begin{figure}[htbp]
+    \centering
+\large{CT-scanner output distributions} \\
+\begin{tikzpicture}[scale=0.9]
+  % Draw blob
+  \draw [very thick, fill=red!50] plot [smooth cycle,tension=0.7] coordinates {(-0.3,-0.7) (0.3,-0.3) (1.2,-0.1) (0.9,0.8) (0.2,0.5) (-0.5,0.8) (-0.7,0) (-0.5,-0.5)};
+  
+  % Draw grid
+  \draw [step=0.2cm,blue!40,very thin] (-1.4,-1.4) grid (1.4,1.4);
+  
+  % Draw axes
+  \draw [->] (-1.5,0) -- (1.5,0) node [below right] {$x$};
+  \draw [->] (0,-1.5) -- (0,1.5) node [above left] {$y$};
+  
+  % Barplot
+  \begin{scope}[shift={(3.35,0)},rotate=90]
+      \draw [fill=red!50] (-1.4,0) rectangle (-1.4+0.2, 0);
+      \draw [fill=red!50] (-1.2,0) rectangle (-1.2+0.2, 0);      \draw [fill=red!50] (-1.0,0) rectangle (-1.0+0.2, 0); \draw [fill=red!50] (-0.8,0) rectangle (-0.8+0.2, 0.0125);\draw [fill=red!50] (-0.6,0) rectangle (-0.6+0.2, 0.05);\draw [fill=red!50] (-0.4,0) rectangle (-0.4+0.2, 0.2);\draw [fill=red!50] (-0.2,0) rectangle (-0.2+0.2, 0.8);\draw [fill=red!50] (0,0) rectangle (0+0.2, 0.9);\draw [fill=red!50] (0.2,0) rectangle (0.2+0.2, 0.78);\draw [fill=red!50] (0.4,0) rectangle (0.4+0.2, 0.65);\draw [fill=red!50] (0.6,0) rectangle (0.6+0.2, 0.2);\draw [fill=red!50] (0.8,0) rectangle (0.8+0.2, 0.01);\draw [fill=red!50] (1.0,0) rectangle (1.0+0.2, 0);\draw [fill=red!50] (1.2,0) rectangle (1.2+0.2, 0);
+  \end{scope}
+
+    % Barplot Bottom
+  \begin{scope}[shift={(0,-2.75)}]
+      \draw [fill=red!50] (-1.4,0) rectangle (-1.4+0.2, 0);
+      \draw [fill=red!50] (-1.2,0) rectangle (-1.2+0.2, 0);      \draw [fill=red!50] (-1.0,0) rectangle (-1.0+0.2, 0); \draw [fill=red!50] (-0.8,0) rectangle (-0.8+0.2, 0.05);\draw [fill=red!50] (-0.6,0) rectangle (-0.6+0.2, 0.5);\draw [fill=red!50] (-0.4,0) rectangle (-0.4+0.2, 0.45);\draw [fill=red!50] (-0.2,0) rectangle (-0.2+0.2, 0.35);\draw [fill=red!50] (0,0) rectangle (0+0.2, 0.3);\draw [fill=red!50] (0.2,0) rectangle (0.2+0.2, 0.32);\draw [fill=red!50] (0.4,0) rectangle (0.4+0.2, 0.35);\draw [fill=red!50] (0.6,0) rectangle (0.6+0.2, 0.35);\draw [fill=red!50] (0.8,0) rectangle (0.8+0.2, 0.3);\draw [fill=red!50] (1.0,0) rectangle (1.0+0.2, 0.2);\draw [fill=red!50] (1.2,0) rectangle (1.2+0.2, 0.01);
+  \end{scope}
+\end{tikzpicture} \hfill
+% Bad resolution
+\begin{tikzpicture}[scale=0.9]
+% Draw blob
+\draw [very thick, fill=red!50] plot [smooth cycle,tension=0.7] coordinates {(-0.3,-0.7) (0.3,-0.3) (1.2,-0.1) (0.9,0.8) (0.2,0.5) (-0.5,0.8) (-0.7,0) (-0.5,-0.5)};
+
+% Draw grid
+\draw [step=0.699cm,blue!40,very thin] (-1.4,-1.4) grid (1.4,1.4);
+
+% Draw axes
+\draw [->] (-1.5,0) -- (1.5,0) node [below right] {$x$};
+\draw [->] (0,-1.5) -- (0,1.5) node [above left] {$y$};
+
+% Barplot (bottom)
+  \begin{scope}[shift={(0,-2.75)}]
+      \draw [fill=red!50] (-1.4,0) rectangle (-1.4+0.7, 0);
+      \draw [fill=red!50] (-0.7,0) rectangle (-1.4+1.4, 0.5);
+      \draw [fill=red!50] (0,0) rectangle (-1.4+2.1, 0.35);
+      \draw [fill=red!50] (0.7,0) rectangle (-1.4+2.8, 0.3);
+  \end{scope}
+
+% Barplot (right)
+\begin{scope}[shift={(3,0)},rotate=90]
+      \draw [fill=red!50] (-1.4,0) rectangle (-1.4+0.7, 0);
+      \draw [fill=red!50] (-0.7,0) rectangle (-1.4+1.4, 0.5);
+      \draw [fill=red!50] (0,0) rectangle (-1.4+2.1, 0.7);
+      \draw [fill=red!50] (0.7,0) rectangle (-1.4+2.8, 0.1);
+\end{scope}
+\end{tikzpicture} \hfill
+% Few rays
+\begin{tikzpicture}[scale=0.9]
+  % Draw blob
+  \draw [very thick, fill=red!50] plot [smooth cycle,tension=0.7] coordinates {(-0.3,-0.7) (0.3,-0.3) (1.2,-0.1) (0.9,0.8) (0.2,0.5) (-0.5,0.8) (-0.7,0) (-0.5,-0.5)};
+  
+  % Draw grid
+  \draw [step=0.2cm,blue!40,very thin] (-1.4,-1.4) grid (1.4,1.4);
+  
+  % Draw axes
+  \draw [->] (-1.5,0) -- (1.5,0) node [below right] {$x$};
+  \draw [->] (0,-1.5) -- (0,1.5) node [above left] {$y$};
+  
+  % Barplot
+  \begin{scope}[shift={(3.35,0)},rotate=90]
+      \draw [fill=red!50] (-1.4,0) rectangle (-1.4+0.2, 0);
+      \draw [fill=red!50] (-1.2,0) rectangle (-1.2+0.2, 0);      \draw [fill=red!50] (-1.0,0) rectangle (-1.0+0.2, 0); \draw [fill=red!50] (-0.8,0) rectangle (-0.8+0.2, 0);\draw [fill=red!50] (-0.6,0) rectangle (-0.6+0.2, 0.05);\draw [fill=red!50] (-0.4,0) rectangle (-0.4+0.2, 0);\draw [fill=red!50] (-0.2,0) rectangle (-0.2+0.2, 0.8);\draw [fill=red!50] (0,0) rectangle (0+0.2, 0);\draw [fill=red!50] (0.2,0) rectangle (0.2+0.2, 0.78);\draw [fill=red!50] (0.4,0) rectangle (0.4+0.2, 0);\draw [fill=red!50] (0.6,0) rectangle (0.6+0.2, 0.2);\draw [fill=red!50] (0.8,0) rectangle (0.8+0.2, 0);\draw [fill=red!50] (1.0,0) rectangle (1.0+0.2, 0);\draw [fill=red!50] (1.2,0) rectangle (1.2+0.2, 0);
+  \end{scope}
+
+    % Barplot Bottom
+  \begin{scope}[shift={(0,-2.75)}]
+      \draw [fill=red!50] (-1.4,0) rectangle (-1.4+0.2, 0);
+      \draw [fill=red!50] (-1.2,0) rectangle (-1.2+0.2, 0);      \draw [fill=red!50] (-1.0,0) rectangle (-1.0+0.2, 0); \draw [fill=red!50] (-0.8,0) rectangle (-0.8+0.2, 0);\draw [fill=red!50] (-0.6,0) rectangle (-0.6+0.2, 0.5);\draw [fill=red!50] (-0.4,0) rectangle (-0.4+0.2, 0);\draw [fill=red!50] (-0.2,0) rectangle (-0.2+0.2, 0.35);\draw [fill=red!50] (0,0) rectangle (0+0.2, 0);\draw [fill=red!50] (0.2,0) rectangle (0.2+0.2, 0.32);\draw [fill=red!50] (0.4,0) rectangle (0.4+0.2, 0);\draw [fill=red!50] (0.6,0) rectangle (0.6+0.2, 0.35);\draw [fill=red!50] (0.8,0) rectangle (0.8+0.2, 0);\draw [fill=red!50] (1.0,0) rectangle (1.0+0.2, 0.2);\draw [fill=red!50] (1.2,0) rectangle (1.2+0.2, 0);
+  \end{scope}
+\end{tikzpicture}
+    \captionsetup{justification=centering}
+    \caption[]{\small Illustration of the output of a CT scanner from two orthogonal angles, using different resolutions and number of rays. \emph{Leftmost:} many rays, good resolution. \emph{Center:} few rays, bad resolution. \emph{Rightmost:} few rays, good resolution}
+    \label{fig:tikz-pictures}
+\end{figure} 
+Therefore, as part of constructing a fast and costefficient CT-scanner design, we simulate distributions using different numbers of rays and angles, and at different resolutions for use in determinening the best combination of these parameters. Moreover, we want our parameters to be robust towards noise and to different possible wood-shapes and shot-distributions and thus also simulate distributions varying these parameters.
+
+\subsection{Data - attenuation coefficients}
+From NIST\footnote{\url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}} we collected the attenuation coefficients for iron/steel and lead/bismuth. Based on this we created the following plot ???
+
 
 \section{Mathematical model}
+\subsection{CT - attenuation distributions - discretization}
+The goal is to reconstruct the object image from the attenuation distributions obtained from the CT-scanner. To that end we first need to understand, how a CT-scanner constructs the attenuation distributions and for that we need Lambert Beer's law. Lambert Beer's law let's us relate the attenuation of every point on a CT-scanner ray to a point in the CT-scanner output distribution in terms of a line integral\footnote{Lambert Beer's law is often stated in terms of an equivalent differential equation, see appendix \ref{appendix:lambert-beers-law}.}: \\
+\begin{equation}
+    \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right)
+\end{equation}
+Where the integration interval $[0, \ell_{\max}]$ is of the ray over the object of interest, $x$ the material dependant attenuation coefficient for every point along the ray through the material and $\log\left(\frac{I_0}{I}\right)$ the value of the point on the attenuation distribution i.e. the attenuation over the whole line. \\
+Solving this setup is, however, very complicated and we therefore make the simplification, that we can approximate the object as a finite number of homogeneous pixels\footnote{Homogeneous in terms of attenuation coefficients}. \\
+\begin{figure}[htbp]
+    \centering
+\large{Discretization of model} \\
+\begin{tikzpicture}[scale=1.8]
+% Define color gradient
+\pgfdeclareverticalshading{blobgrad}{100bp}{
+color(0bp)=(red!70);
+color(25bp)=(red!70);
+color(50bp)=(yellow!50);
+color(75bp)=(green!50);
+color(100bp)=(blue!50)
+}
+% Draw blob with color gradient
+\shadedraw [very thick, shading=blobgrad] plot [smooth cycle,tension=0.7] coordinates {(-0.3,-0.7) (0.3,-0.3) (1.2,-0.1) (0.9,0.8) (0.2,0.5) (-0.5,0.8) (-0.7,0) (-0.5,-0.5)};
+% Draw grid
+\draw [step=0.2cm,blue!40,very thin] (-1.4,-1.4) grid (1.4,1.4);
+% Draw axes
+\draw [->] (-1.5,0) -- (1.5,0) node [below right] {};
+\draw [->] (0,-1.5) -- (0,1.5) node [above left] {};
+
+% Draw slanted line
+\draw [very thick, dashed] (-1.8,0) coordinate (start) -- (1.8,0.6) coordinate (end);
+
+% Draw zoombox lines
+\draw [color=red] (0.2, 0.2) -- (3,-0.4);
+\draw [color=red] (0.2, 0.4) -- (3,0.8);
+\draw [shading=axis, left color=red!50, right color=red!50, opacity=0.5, draw=red] (0,0.2) rectangle (0.2,0.4);
+\draw [shading=axis, left color=green!50, right color=green!50, opacity=0.5, draw=red] (3,-0.4) rectangle (4.2,0.8);
+
+% Draw slanted line
+\draw [very thick, dashed] (3,0.26667) coordinate (start) -- (4.2,0.46667) coordinate (end);
+\draw [decorate,decoration={brace,amplitude=5pt},xshift=0pt,yshift=5pt] (start) -- (end) node [midway, above, yshift=5pt] {\small $\int_{\ell}x \text{d} \ell \approx x_{n} \ell$};
+\draw (-1.145,1.17) node [above left] {\tiny $x_1$};
+\draw (-1.145,0.98) node [above left] {\tiny $x_2$};
+\draw (-1.145,0.79) node [above left] {\tiny $x_3$};
+\draw (-1.1375,-1.425) node [above left] {\tiny $x_{\scalemath{0.7}{N}}$};
+\draw (1.469,-1.422) node [above left] {\tiny $x_{\scalemath{0.6}{N^2}}$};
+
+\end{tikzpicture}
+    \captionsetup{justification=centering}
+    \caption[]{\small Illustration of discretized model and zoombox illustrating the effect of assuming constant attenuation for every grid cell of the discrete object - note that color is used to illustrate a varying density over the object}
+    \label{fig:tikz-pictures2}
+\end{figure} \\
+Then by the homogeneity of every pixel, the line-integral over that pixel is just the product of the length of the line over that pixel and it's attenuation coefficient.
+
+
+
+
+% Let every pixel of the image have an unknown, but uniform, attenuation such that we by the discretization of Lambert Beer's law\footnote{See appendix \ref{appendix:simplification-discreatization}} can set up the following model in which we start by slicing the sample into a $N \times N$ grid each grid length $D = L/N$ ($L$: length of sample). This means that $\boldsymbol{x} \in \mathbb{R}^n, n = N^2$.
+
+For a given ray $i$ we thus have:
+
+\begin{equation}\label{eq:for-one-ray}
+    \sum_{j \in S_i} x_j \ell_{i, j} = \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right) = b_i,
+\end{equation}
+
+Where $S_i$ is the collection of pixels which are hit by ray $i$, $x_j$ is the attenuation coefficients (assumed to be constant for a single pixel), $\ell_{i, j}$ is, by the line integral interpretation, the length of ray $i$ through the $j$'th pixel in $S_i$. The number $b_i$ corresponds to $\log{(I_0 / I)}$. 
+
+Sending a total of $m$ rays through the sample\footnote{Noting that every new angle induces a new number of rays which are included in the $m$}  and defining
+
+\begin{equation}
+    a_{i, j} = 
+    \begin{cases}
+        \ell_{i, j} & \text{if beam $i$ hits pixel $j$} \\
+        0 & \text{otherwise,}
+    \end{cases}
+\end{equation}
+
+we can, by applying equation \ref{eq:for-one-ray}, construct the following linear system
+
+\begin{equation}
+    \boldsymbol{A} \boldsymbol{x} = \boldsymbol{b},
+\end{equation}
+
+where $\boldsymbol{A} = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. 
+
+
 
 \section{Discussion}
 
+
+
+
 \section{Conclude}
+
+
+
+
+
 
 
 \newpage
 \appendix
 \section{Code}
+
+\section{Mathematical derivations}
+\subsection{Lambert Beer's Law}\label{appendix:lambert-beers-law}
+If we consider Lamberts-Beer's law
+
+\begin{equation}\label{eq:lamberts-beer}
+    \diff{I}{\ell} = -x I(\ell),
+\end{equation}
+
+then, and assuming $I \neq 0$, we get
+
+\begin{equation}
+    \frac{I'(\ell)}{I(\ell)} = -x.
+\end{equation}
+
+Integrating both sides of this expressions yields
+
+\begin{equation}
+    \int_{0}^{\ell_{\max}} \frac{I'(\ell)}{I(\ell)} \; \mathrm{d}\ell = \int_{0}^{\ell_{\max}} -x \; \mathrm{d}\ell,
+\end{equation}
+
+so
+
+\begin{equation}
+    \ln{I(\ell)} \big|_{0}^{\ell_{\max}} = \int_{0}^{\ell_{\max}} -x \; \mathrm{d}\ell.
+\end{equation}
+
+Therefore by setting $I(0) = I_0$ and solving for $I(\ell_{\max}) = I$, which represents the intensity of the beam after it has passed through the sample, we get
+
+\begin{equation}
+    I = I_0 \exp{\left(-\int_{0}^{\ell_{\max}} x \; \mathrm{d}\ell \right)}.
+\end{equation}
+
+Or equivalently:
+
+\begin{equation}
+    \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right)
+\end{equation}
+
+As a special case when the material homogeneous we get that $x = x_0$ is independent of $\ell$ and therefore
+
+\begin{equation}
+    I = I_0 \exp{(-x_0 \ell_{\max})}.
+\end{equation}
+
+% \subsection{Simplification of the model}\label{appendix:simplification-discreatization}
+% Approximating the integral using the Riemann definition we get, using the given partition of $x_1, x_2, \dots, x_p$
+
+% \begin{equation}
+%     \int_{0}^{\ell_{\max}} x \; \mathrm{d}\ell \approx \sum_{j=1}^{p} x_j \ell_j.
+% \end{equation}
 
 \end{document}
