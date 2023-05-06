@@ -163,10 +163,22 @@ From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coef
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.5]{images/attenuation_coef.png}
-    \caption{\small Something wise. Note that the x-axis is log scaled. The blue area is the typical range for commercial x-ray sources (10 keV - 200 keV). Each mark on the graph is a data point from NIST.}
-    \label{fig:attenuation_coef}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[scale=0.4]{images/attenuation_coef_zoom.png}
+        \caption{\small Something wise. Note that the x-axis is log scaled. The blue area is the typical range for commercial x-ray sources (10 keV - 200 keV). Each mark on the graph is a data point from NIST.}
+        \label{fig:attenuation_coef}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[scale=0.4]{images/diff-attenuation-coef-bismuth-iron-zoom.png}
+        \caption{\small Another picture \newline \newline \newline.}
+        \label{fig:zoom}
+    \end{subfigure}
+    \caption{Two images side by side.}
+    \label{fig:both}
 \end{figure}
+
 
 Based on Figure \ref{fig:attenuation_coef} we see that the best value for noticing a difference between wood, bismuth and iron is at 10 keV. It should also be noted that there is not a lot of data in the area where we see the greatest difference and therefore a better configuration of the x-ray is possible. 
 % I hope the last sentences makses sense, otherwise change it! 
