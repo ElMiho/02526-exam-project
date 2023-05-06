@@ -6,6 +6,15 @@ from paralleltomo import paralleltomo
 import sklearn.linear_model as sklin
 from generate_test_functions import *
 
+def likelihood(recovered_image, attenuations):
+    n,m = recovered_image.shape
+    for i in range(n):
+        for j in range(m):
+            x = recovered_image[i,j]
+            y = np.abs([x-attenuations[0],x-attenuations[1],x-attenuations[2]])
+            idx = np.argmin(y)
+            recovered_image[i,j] = attenuations[idx]
+
 n = 50
 num_pellets = 100
 pellet_size = 1

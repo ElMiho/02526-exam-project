@@ -58,6 +58,7 @@ diff_coef = np.abs(yinterp_bismuth-yinterp_iron)
 x_combined = sorted(list(x_val_iron) + list(x_val_bismuth))
 new_y_bismuth = np.interp(x_combined, x_val_bismuth, y_val_bismuth)
 new_y_iron = np.interp(x_combined, x_val_iron, y_val_iron)
+new_y_wood = np.interp(x_combined, x_val_wood, y_val_wood)
 
 diff_yinterp = np.abs(new_y_bismuth - new_y_iron)
 plt.figure("diff")
@@ -74,6 +75,8 @@ plt.close()
 
 combined = [(diff, x, np.log(x)) for diff,x in zip(diff_yinterp, x_combined) if x >= 10 and x <= 200]
 print(max(combined, key=lambda v: v[0]))
+for x,bismuth_atten_coeff, in zip(x_combined, new_y_bismuth, new_y_bismuth):
+    if 
 
 # plt.figure("log x-axis")
 # #plt.plot(np.log(x_val_bismuth), np.log(y_val_bismuth), 'o')
