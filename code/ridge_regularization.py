@@ -79,6 +79,7 @@ A,_,_,_ = paralleltomo(N)
 
 b = A @ x_input
 
+im, _, _, _ = np.linalg.lstsq(A, b)
 
 
 # n = 50
