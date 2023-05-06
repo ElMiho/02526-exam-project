@@ -29,7 +29,7 @@ xinterp = np.linspace(min(x_val_oxygen), max(x_val_oxygen), 1000)
 
 
 #Density, wood, iron, lead, bismuth [g/cm^3]
-density = [600, 7.874, 11.34, 9.78]
+density = [0.82, 7.874, 11.34, 9.78]
 
 # Change from MeV to KeV
 x_val_iron = 1000 * iron_coef[:,0]
