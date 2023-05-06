@@ -159,8 +159,17 @@ How representative these distributions are of the actual object depends on the n
 Therefore, as part of constructing a fast and costefficient CT-scanner design, we simulate distributions using different numbers of rays and angles, and at different resolutions for use in determinening the best combination of these parameters. Moreover, we want our parameters to be robust towards noise and to different possible wood-shapes and shot-distributions and thus also simulate distributions varying these parameters.
 
 \subsection{Data - attenuation coefficients}
-From NIST\footnote{\url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}} we collected the attenuation coefficients for iron/steel and lead/bismuth. Based on this we created the following plot ???
+From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{Wood calculated based on its percentages of carbon, hydrogen and oxygen.}. Based on this we created the following plot (Figure \ref{fig:attenuation_coef}).
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{images/attenuation_coef.png}
+    \caption{\small Something wise. Note that the x-axis is log scaled. The blue area is the typical range for commercial x-ray sources (10 keV - 200 keV). Each mark on the graph is a data point from NIST and the lines are calculated by linear interpolation.}
+    \label{fig:attenuation_coef}
+\end{figure}
+
+Based on Figure \ref{fig:attenuation_coef} we see that the best value for noticing a difference between wood, bismuth and iron is at 10 keV. It should also be noted that there is not a lot of data in the area where we see the greatest difference and therefore a better configuration of the x-ray is possible. 
+% I hope the last sentences makses sense, otherwise change it! 
 
 \section{Mathematical model}
 \subsection{CT - attenuation distributions - discretization}
@@ -169,7 +178,7 @@ The goal is to reconstruct the object image from the attenuation distributions o
     \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right)
 \end{equation}
 Where the integration interval $[0, \ell_{\max}]$ is of the ray over the object of interest, $x$ the material dependant attenuation coefficient for every point along the ray through the material and $\log\left(\frac{I_0}{I}\right)$ the value of the point on the attenuation distribution i.e. the attenuation over the whole line. \\
-Solving this setup is, however, very complicated and we therefore make the simplification, that we can approximate the object as a finite number of homogeneous pixels\footnote{Homogeneous in terms of attenuation coefficients}. \\
+Solving this setup is, however, very complicated and we therefore make the simplification, that we can approximate the object as a finite number of homogeneous pixels\footnote{Homogeneous in terms of attenuation coefficients.}. \\
 \begin{figure}[htbp]
     \centering
 \large{Discretization of model} \\
@@ -201,7 +210,7 @@ color(100bp)=(blue!50)
 
 % Draw slanted line
 \draw [very thick, dashed] (3,0.26667) coordinate (start) -- (4.2,0.46667) coordinate (end);
-\draw [decorate,decoration={brace,amplitude=5pt},xshift=0pt,yshift=5pt] (start) -- (end) node [midway, above, yshift=5pt] {\small $\int_{\ell}x \text{d} \ell \approx x_{n} \ell$};
+\draw [decorate,decoration={brace,amplitude=5pt},xshift=0pt,yshift=5pt] (start) -- (end) node [midway, above, yshift=5pt] {\small $\int_{\ell}x \text{d} \ell = x_{n} \ell$};
 \draw (-1.145,1.17) node [above left] {\tiny $x_1$};
 \draw (-1.145,0.98) node [above left] {\tiny $x_2$};
 \draw (-1.145,0.79) node [above left] {\tiny $x_3$};
@@ -241,20 +250,20 @@ Sending a total of $m$ rays through the sample\footnote{Noting that every new an
 we can, by applying equation \ref{eq:for-one-ray}, construct the following linear system
 
 \begin{equation}
-    \boldsymbol{A} \boldsymbol{x} = \boldsymbol{b},
+    A \boldsymbol{x} = \boldsymbol{b},
 \end{equation}
 
-where $\boldsymbol{A} = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. 
+where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. 
 
 
 
 \section{Discussion}
-
-
+To reconstruct an image from the attenuation distributions by a CT-scanner well enough to spot some detail, in this case shots in logs, there are a lot of parameters that can be tuned and approximations to be made. The specific approximations and simplifications to make is a model specific task and all come with tradeoffs.
+???
 
 
 \section{Conclude}
-
+???
 
 
 
