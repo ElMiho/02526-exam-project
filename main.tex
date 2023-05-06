@@ -160,27 +160,6 @@ Therefore, as part of constructing a fast and costefficient CT-scanner design, w
 \subsection{Data - attenuation coefficients}
 From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{Wood calculated based on its percentages of carbon, hydrogen and oxygen.}. Based on this we created the following plots (Figure \ref{fig:both-attenuation-coeff-plots}).
 
-\begin{figure}[H]
-    \centering
-    \large{Attenuation coefficients} \\
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[scale=0.4]{images/attenuation_coef_zoom.png}
-        \caption{\small Note that the x-axis is log scaled. Each mark on the graph is a data point from NIST. \newline}
-        \label{fig:attenuation-coef-zoom}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
-        \centering
-        \includegraphics[scale=0.4]{images/diff-attenuation-coef-bismuth-iron-zoom.png}
-        \caption{\small Absolute difference between the attenuation coefficients for bismuth and iron. Data is calculated using linear interpolation - see appendix \ref{appendix:attenuation-coefficients}.}
-        \label{fig:diff-attenuation-coef-bismuth-iron}
-    \end{subfigure}
-    \caption{\small Note that in both of these images that they are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
-    \label{fig:both-attenuation-coeff-plots}
-\end{figure}
-
-
-Based on Figure \ref{fig:attenuation-coef-zoom} and Figure \ref{fig:diff-attenuation-coef-bismuth-iron} we see that the best value for noticing a difference between wood, bismuth and iron is at 16.4 keV. 
 
 \section{Mathematical model}
 \subsection{CT - attenuation distributions - discretization}
@@ -267,6 +246,29 @@ we can, by applying equation \ref{eq:for-one-ray}, construct the following linea
 where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. 
 
 \section{Experiments and results}
+\subsection{Optimal CT-model parameters}
+???
+\subsection{Energy usage}
+\begin{figure}[H]
+    \centering
+    \large{Attenuation coefficients} \\
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[scale=0.4]{images/attenuation_coef_zoom.png}
+        \caption{\small Note that the x-axis is log scaled. Each mark on the graph is a data point from NIST. \newline}
+        \label{fig:attenuation-coef-zoom}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[scale=0.4]{images/diff-attenuation-coef-bismuth-iron-zoom.png}
+        \caption{\small Absolute difference between the attenuation coefficients for bismuth and iron. Data is calculated using linear interpolation - see appendix \ref{appendix:attenuation-coefficients}.}
+        \label{fig:diff-attenuation-coef-bismuth-iron}
+    \end{subfigure}
+    \caption{\small Note that in both of these images that they are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
+    \label{fig:both-attenuation-coeff-plots}
+\end{figure}
+
+Based on Figure \ref{fig:attenuation-coef-zoom} and Figure \ref{fig:diff-attenuation-coef-bismuth-iron} we see that the best value for noticing a difference between wood, bismuth and iron is at 16.4 keV. 
 
 
 
@@ -278,6 +280,13 @@ To reconstruct an image from the attenuation distributions by a CT-scanner well 
 \section{Conclude}
 ???
 
+\section{The list ??? SKAL SLETTES}
+\begin{itemize}
+    \item Vinkler, rays, N osv. argumentation --> konditionstal + confusion matrix
+    \item Ridge regression - test kvalitativ, confusion matrix og tid
+    \item Skrive rapport og sætte alt pænt op
+    \item Gå gennem punkterne på peergrade og sikre, at alt er godt
+\end{itemize}
 
 
 
@@ -320,10 +329,10 @@ Therefore by setting $I(0) = I_0$ and solving for $I(\ell_{\max}) = I$, which re
 Or equivalently:
 
 \begin{equation}
-    \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right)
+    \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right).
 \end{equation}
 
-As a special case when the material homogeneous we get that $x = x_0$ is independent of $\ell$ and therefore
+As a special case when the material is homogeneous we get that $x = x_0$ is independent of $\ell$ and therefore
 
 \begin{equation}
     I = I_0 \exp{(-x_0 \ell_{\max})}.
