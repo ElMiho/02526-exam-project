@@ -20,32 +20,31 @@
 \newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
 
 
-\definecolor{deepblue}{rgb}{0,0,0.5}
-\definecolor{deepred}{rgb}{0.6,0,0}
-\definecolor{deepgreen}{rgb}{0,0.5,0}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
-% JULIA STUFF
-\lstdefinelanguage{Julia}%
-  {morekeywords={abstract,break,case,catch,const,continue,do,else,elseif,%
-      end,export,false,for,function,immutable,import,importall,if,in,%
-      macro,module,otherwise,quote,return,switch,true,try,type,typealias,%
-      using,while},%
-   sensitive=true,%
-   alsoother={},%
-   morecomment=[l]\#,%
-   morecomment=[n]{\#=}{=\#},%
-   morestring=[s]{"}{"},%
-   morestring=[m]{'}{'},%
-}[keywords,comments,strings]%
-
-\lstset{%
-    language         = Julia,
-    basicstyle       = \ttfamily,
-    keywordstyle     = \bfseries\color{blue},
-    stringstyle      = \color{magenta},
-    commentstyle     = \color{ForestGreen},
-    showstringspaces = false,
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
 }
+
+\lstset{style=mystyle}
 
 \newcommand{\diff}[2]{\frac{\text{d} #1}{\text{d} #2}}
 
@@ -175,7 +174,7 @@ From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coef
         \caption{\small Absolute difference between the attenuation coefficients for bismuth and iron. Data is calculated using linear interpolation - see appendix ???.}
         \label{fig:diff-attenuation-coef-bismuth-iron}
     \end{subfigure}
-    \caption{Note that in both of these images that they are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
+    \caption{\small Note that in both of these images that they are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
     \label{fig:both-attenuation-coeff-plots}
 \end{figure}
 
@@ -266,6 +265,8 @@ we can, by applying equation \ref{eq:for-one-ray}, construct the following linea
 
 where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. 
 
+\section{Experiments and results}
+
 
 
 \section{Discussion}
@@ -283,8 +284,6 @@ To reconstruct an image from the attenuation distributions by a CT-scanner well 
 
 \newpage
 \appendix
-\section{Code}
-
 \section{Mathematical derivations}
 \subsection{Lambert Beer's Law}\label{appendix:lambert-beers-law}
 If we consider Lamberts-Beer's law
@@ -335,5 +334,21 @@ As a special case when the material homogeneous we get that $x = x_0$ is indepen
 % \begin{equation}
 %     \int_{0}^{\ell_{\max}} x \; \mathrm{d}\ell \approx \sum_{j=1}^{p} x_j \ell_j.
 % \end{equation}
+
+\section{Code}
+All code can also be found on GitHub \url{https://github.com/ElMiho/02526-exam-project}. 
+
+\subsection{Exercise 1}
+\subsubsection{With cvxpy}
+\lstinputlisting[language=Python, breaklines=true]{code/exercise_1_cvxpy.py}
+
+\subsubsection{Without cvxpy}
+\lstinputlisting[language=Python, breaklines=true]{code/exercise_1.py}
+
+\subsection{Attenuation coefficients}
+\lstinputlisting[language=Python, breaklines=true]{code/atttenuation_coef.py}
+
+\subsection{Paralleltomo}
+\lstinputlisting[language=Python, breaklines=true]{code/paralleltomo.py}
 
 \end{document}
