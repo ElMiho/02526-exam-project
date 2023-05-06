@@ -61,8 +61,12 @@ new_y_iron = np.interp(x_combined, x_val_iron, y_val_iron)
 
 diff_yinterp = np.abs(new_y_bismuth - new_y_iron)
 plt.figure("diff")
-plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
 plt.plot(np.log(x_combined), diff_yinterp, '-x')
+plt.xlabel("Log X-Ray [keV]")
+plt.ylabel("Attenuation coef [cm^2 / g]")
+plt.legend(["Absolute difference between bismuth and iron"])
+
+plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
 
 combined = [(diff, x, np.log(x)) for diff,x in zip(diff_yinterp, x_combined) if x >= 10 and x <= 200]
 print(max(combined, key=lambda v: v[0]))
