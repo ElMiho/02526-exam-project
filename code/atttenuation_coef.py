@@ -35,11 +35,11 @@ y_val_wood = wood_composite[0]*y_val_carbon+wood_composite[1]*y_val_hydrogen+woo
 
 # Plots energy used vs proportion of beam intensity leaving log to be recepted compared to incomming
 I0 = 1
-density_wood = 0.65 # g / cm^3
+density_wood = 0.7 # g / cm^3
 thickness = 50 # cm
 I = lambda energy: I0 * np.exp(-y_val_wood[list(x_val_wood).index(energy)] * (thickness * density_wood))
 
-my_if = lambda x: x >= 5 and x <= 205
+my_if = lambda x: x >= 5 and x <= 250
 
 plt.plot([x for x in x_val_wood if my_if(x)], [I(x) * 100 for x in x_val_wood if my_if(x)])
 plt.xlabel("Energy [keV]")
