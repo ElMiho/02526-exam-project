@@ -93,7 +93,7 @@ plt.plot(
     np.log([x for x in x_combined if x >= 10 and x <= 200]), 
     [diff for x,diff in zip(x_combined, diff_yinterp) if x >= 10 and x <= 200], '-x', linewidth=3)
 plt.xlabel("Log X-Ray [keV]", fontsize=16)
-plt.ylabel("Attenuation coef [cm^(-1)]", fontsize=16)
+plt.ylabel(r"Attenuation coef [$cm^{-1}$]", fontsize=16)
 plt.legend(["Absolute difference between bismuth and iron"], fontsize="14", loc="upper right")
 
 # plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
@@ -132,7 +132,7 @@ plt.plot(np.log(x_f(x_val_iron)), diff_f(x_val_iron, y_val_iron), '-x', linewidt
 plt.plot(np.log(x_f(x_val_bismuth)), diff_f(x_val_bismuth, y_val_bismuth), '-x', linewidth=3)
 plt.plot(np.log(x_f(x_val_wood)), diff_f(x_val_wood, y_val_wood), '-x', linewidth=3)
 plt.xlabel("Log X-Ray [keV]", fontsize=16)
-plt.ylabel("Attenuation coef [cm^(-1)]", fontsize=16)
+plt.ylabel(r"Attenuation coef [$cm^{-1}$]", fontsize=16)
 
 #plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
 plt.legend(["Iron", "Bismuth", "Wood"], fontsize="17")
