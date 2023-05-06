@@ -69,7 +69,10 @@ max_pixel = np.max(testImage)
 testImage = testImage / max_pixel
 
 unique_values = np.unique(testImage)
-downSamplingFactor = 200
+# Wood, Bismuth, Iron
+att_coefs = unique_values[1:]
+
+downSamplingFactor = 100
 
 N = int(testImage.shape[1]/downSamplingFactor)
 resizedImage = ski.measure.block_reduce(testImage, block_size=downSamplingFactor)
@@ -81,6 +84,15 @@ b = A @ x_input
 
 im, _, _, _ = np.linalg.lstsq(A, b)
 
+im = np.reshape(im, (N, N), order="F")
+
+predicted_im,predicted_bismuth,predicted_steel = predictions(im,att_coefs)
+
+confusion_steel = generate_confusion(predicted_steel,im,predicted_im,att_coefs[2])
+confusion_bismuth = generate_confusion(predicted_bismuth,im,predicted_im,att_coefs[1])
+
+print(f"confusion matrix steel:\n {confusion_steel}")
+print(f"confusion matrix bismuth:\n {confusion_bismuth}")
 
 # n = 50
 # num_pellets = 100

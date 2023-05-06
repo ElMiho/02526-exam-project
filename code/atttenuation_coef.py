@@ -102,10 +102,10 @@ plt.close()
 
 combined = [(diff, x, np.log(x)) for diff,x in zip(diff_yinterp, x_combined) if x >= 10 and x <= 200]
 print(max(combined, key=lambda v: v[0]))
-for x, bismuth_atten_coeff, iron_atten_coeff, wood_atten_coeff in zip(x_combined, new_y_bismuth, new_y_iron, new_y_wood):
-    if x == max(combined, key=lambda v: v[0])[1]:
-        print(f"Bismuth coeff: {bismuth_atten_coeff} | Iron coeff: {iron_atten_coeff} | Wood coeff: {wood_atten_coeff}")
-        break
+# for x, bismuth_atten_coeff, iron_atten_coeff, wood_atten_coeff in zip(x_combined, new_y_bismuth, new_y_iron, new_y_wood):
+#     if x == max(combined, key=lambda v: v[0])[1]:
+#         print(f"Bismuth coeff: {bismuth_atten_coeff} | Iron coeff: {iron_atten_coeff} | Wood coeff: {wood_atten_coeff}")
+#         break
 
 # plt.figure("log x-axis")
 # #plt.plot(np.log(x_val_bismuth), np.log(y_val_bismuth), 'o')
