@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -55,3 +56,5 @@ plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha
 plt.figure(2)
 plt.plot(np.log(xinterp),diff_coef)
 plt.show()
+
+# %%

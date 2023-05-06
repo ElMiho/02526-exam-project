@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -58,3 +59,5 @@ plt.legend(["Bismuth", "Iron", "Wood", "Lead"])
 plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
 
 plt.show()
+
+# %%
