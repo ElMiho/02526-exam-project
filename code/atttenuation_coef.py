@@ -88,7 +88,7 @@ new_y_iron = np.interp(x_combined, x_val_iron, y_val_iron)
 new_y_wood = np.interp(x_combined, x_val_wood, y_val_wood)
 
 diff_yinterp = np.abs(new_y_bismuth - new_y_iron)
-plt.figure("diff", figsize=(14,14))
+plt.figure("diff", figsize=(10,10))
 plt.plot(
     np.log([x for x in x_combined if x >= 10 and x <= 200]), 
     [diff for x,diff in zip(x_combined, diff_yinterp) if x >= 10 and x <= 200], '-x', linewidth=3)
@@ -127,7 +127,7 @@ for x, bismuth_atten_coeff, iron_atten_coeff, wood_atten_coeff in zip(x_combined
 diff_f = lambda x_list, diff_list: [diff for x, diff in zip(x_list, diff_list) if x >= 10 and x <= 200]
 x_f = lambda x_list: [x for x in x_list if x >= 10 and x <= 200]
 
-plt.figure("raw data, log x", figsize=(14,14))
+plt.figure("raw data, log x", figsize=(10,10))
 plt.plot(np.log(x_f(x_val_iron)), diff_f(x_val_iron, y_val_iron), '-x', linewidth=3)
 plt.plot(np.log(x_f(x_val_bismuth)), diff_f(x_val_bismuth, y_val_bismuth), '-x', linewidth=3)
 plt.plot(np.log(x_f(x_val_wood)), diff_f(x_val_wood, y_val_wood), '-x', linewidth=3)
