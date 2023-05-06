@@ -53,7 +53,7 @@
     \large X-ray and Computed Tomography
 }
 \author{Hugo M. Nielsen (s214734) \and Mikael H. Hoffmann (s214753) \and Christian Valentin Kjær (s211469) \and Jacob Tuxen (s194572)}
-\date{???}
+\date{7/5-2023}
 
 \begin{document}
 \maketitle
@@ -171,7 +171,7 @@ From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coef
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[scale=0.4]{images/diff-attenuation-coef-bismuth-iron-zoom.png}
-        \caption{\small Absolute difference between the attenuation coefficients for bismuth and iron. Data is calculated using linear interpolation - see appendix ???.}
+        \caption{\small Absolute difference between the attenuation coefficients for bismuth and iron. Data is calculated using linear interpolation - see appendix \ref{appendix:attenuation-coefficients}.}
         \label{fig:diff-attenuation-coef-bismuth-iron}
     \end{subfigure}
     \caption{\small Note that in both of these images that they are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
@@ -339,16 +339,25 @@ As a special case when the material homogeneous we get that $x = x_0$ is indepen
 All code can also be found on GitHub \url{https://github.com/ElMiho/02526-exam-project}. 
 
 \subsection{Exercise 1}
-\subsubsection{With cvxpy}
+\subsubsection{With cvxpy}\label{appendix:exercise-1-cvxpy}
 \lstinputlisting[language=Python, breaklines=true]{code/exercise_1_cvxpy.py}
 
-\subsubsection{Without cvxpy}
+\subsubsection{Without cvxpy}\label{appendix:exercise-1}
 \lstinputlisting[language=Python, breaklines=true]{code/exercise_1.py}
 
-\subsection{Attenuation coefficients}
+\subsection{Attenuation coefficients}\label{appendix:attenuation-coefficients}
 \lstinputlisting[language=Python, breaklines=true]{code/atttenuation_coef.py}
 
-\subsection{Paralleltomo}
+\subsection{Paralleltomo}\label{appendix:paralleltomo}
 \lstinputlisting[language=Python, breaklines=true]{code/paralleltomo.py}
+
+\subsection{Test functions}\label{appendix:generate-test-functions}
+\lstinputlisting[language=Python, breaklines=true]{code/generate_test_functions.py}
+
+\subsection{Ridge regularization}\label{appendix:ridge-regularization}
+\lstinputlisting[language=Python, breaklines=true]{code/ridge_regularization.py}
+
+\subsection{Validation}\label{appendix:validation}
+\lstinputlisting[language=Python, breaklines=true]{code/validation.py}
 
 \end{document}
