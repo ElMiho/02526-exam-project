@@ -28,6 +28,9 @@ x_val_iron = 1000*iron_coef[:,0]
 x_val_bismuth = 1000*bismuth_coef[:,0]
 x_val_lead = 1000 * lead_coef[:, 0]
 
+print(f"bismuth x: {x_val_bismuth}")
+print(f"log bismuth x: {np.log(x_val_bismuth)}")
+
 y_val_iron = iron_coef[:,1]
 y_val_bismuth = bismuth_coef[:,1]
 y_val_lead = lead_coef[:, 1]
@@ -43,7 +46,7 @@ yinterp_lead = np.interp(xinterp, x_val_lead, y_val_lead)
 diff_coef = np.abs(yinterp_bismuth-yinterp_iron)
 
 
-plt.figure(1)
+plt.figure("log x-axis")
 #plt.plot(np.log(x_val_bismuth), np.log(y_val_bismuth), 'o')
 #plt.plot(np.log(x_val_iron), (y_val_iron), 'o')
 plt.plot(np.log(xinterp),yinterp_bismuth, '-x')
