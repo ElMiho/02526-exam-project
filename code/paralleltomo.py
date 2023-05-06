@@ -31,7 +31,7 @@ def paralleltomo(*args):
 #Anders Nymark Christensen, 20180216, DTU Compute
 #Revised from the matlab version by:
     
-# Jakob Sauer Jørgensen, Maria Saxild-Hansen and Per Christian Hansen,
+# Jakob Sauer Joergensen, Maria Saxild-Hansen and Per Christian Hansen,
 # October 1, 201r, DTU Compute.
 
 # Reference: A. C. Kak and M. Slaney, Principles of Computerized 
