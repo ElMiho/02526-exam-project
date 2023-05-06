@@ -159,29 +159,28 @@ How representative these distributions are of the actual object depends on the n
 Therefore, as part of constructing a fast and costefficient CT-scanner design, we simulate distributions using different numbers of rays and angles, and at different resolutions for use in determinening the best combination of these parameters. Moreover, we want our parameters to be robust towards noise and to different possible wood-shapes and shot-distributions and thus also simulate distributions varying these parameters.
 
 \subsection{Data - attenuation coefficients}
-From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{Wood calculated based on its percentages of carbon, hydrogen and oxygen.}. Based on this we created the following plot (Figure \ref{fig:attenuation_coef}).
+From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{Wood calculated based on its percentages of carbon, hydrogen and oxygen.}. Based on this we created the following plots (Figure \ref{fig:both-attenuation-coeff-plots}).
 
 \begin{figure}[H]
     \centering
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[scale=0.4]{images/attenuation_coef_zoom.png}
-        \caption{\small Something wise. Note that the x-axis is log scaled. The blue area is the typical range for commercial x-ray sources (10 keV - 200 keV). Each mark on the graph is a data point from NIST.}
-        \label{fig:attenuation_coef}
+        \caption{\small Note that the x-axis is log scaled. Each mark on the graph is a data point from NIST. \newline}
+        \label{fig:attenuation-coef-zoom}
     \end{subfigure}
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[scale=0.4]{images/diff-attenuation-coef-bismuth-iron-zoom.png}
-        \caption{\small Another picture \newline \newline \newline.}
-        \label{fig:zoom}
+        \caption{\small Absolute difference between the attenuation coefficients for bismuth and iron. Data is calculated using linear interpolation - see appendix ???.}
+        \label{fig:diff-attenuation-coef-bismuth-iron}
     \end{subfigure}
-    \caption{Two images side by side.}
-    \label{fig:both}
+    \caption{Note that in both of these images that they are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
+    \label{fig:both-attenuation-coeff-plots}
 \end{figure}
 
 
-Based on Figure \ref{fig:attenuation_coef} we see that the best value for noticing a difference between wood, bismuth and iron is at 10 keV. It should also be noted that there is not a lot of data in the area where we see the greatest difference and therefore a better configuration of the x-ray is possible. 
-% I hope the last sentences makses sense, otherwise change it! 
+Based on Figure \ref{fig:attenuation-coef-zoom} and Figure \ref{fig:diff-attenuation-coef-bismuth-iron} we see that the best value for noticing a difference between wood, bismuth and iron is at 16.4 keV. 
 
 \section{Mathematical model}
 \subsection{CT - attenuation distributions - discretization}
