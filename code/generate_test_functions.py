@@ -65,7 +65,8 @@ def add_pellet(image, loc, pellet_size, att_coef):
     return image
 
 def generate_im(n,att_coefs,num_pellets,pellet_size):
-    im = initialize_im(n,att_coefs[0])
+    att_wood = att_coefs[1]
+    im = initialize_im(n,att_wood)
     locations = pellet_location(n,num_pellets,pellet_size)
     idx = valid_indicies(locations,pellet_size)
     num_steel = np.random.randint(0,len(locations))

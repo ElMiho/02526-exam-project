@@ -28,18 +28,22 @@ xinterp = np.linspace(min(x_val_oxygen), max(x_val_oxygen), 1000)
 #yinterp_wood = wood_composite[0]*np.interp(xinterp, x_val_carbon, y_val_carbon)+wood_composite[1]*np.interp(xinterp, x_val_hydrogen, y_val_hydrogen)+wood_composite[2]*np.interp(xinterp, x_val_oxygen, y_val_oxygen)
 
 
+#Density, wood, iron, lead, bismuth [g/cm^3]
+density = [600, 7.874, 11.34, 9.78]
 
 # Change from MeV to KeV
 x_val_iron = 1000 * iron_coef[:,0]
-x_val_bismuth = 1000 * bismuth_coef[:,0]
+x_val_bismuth = 1000 * bismuth_coef[:,0] 
 x_val_lead = 1000 * lead_coef[:, 0]
 
 # print(f"bismuth x: {x_val_bismuth}")
 # print(f"log bismuth x: {np.log(x_val_bismuth)}")
 
-y_val_iron = iron_coef[:,1]
-y_val_bismuth = bismuth_coef[:,1]
-y_val_lead = lead_coef[:, 1]
+y_val_iron = iron_coef[:,1] * density[1]
+y_val_bismuth = bismuth_coef[:,1] * density[3]
+y_val_lead = lead_coef[:, 1] * density[2]
+
+y_val_wood = density[0] * y_val_wood
 
 #Interpolate data
 
@@ -75,8 +79,10 @@ plt.close()
 
 combined = [(diff, x, np.log(x)) for diff,x in zip(diff_yinterp, x_combined) if x >= 10 and x <= 200]
 print(max(combined, key=lambda v: v[0]))
-for x,bismuth_atten_coeff, in zip(x_combined, new_y_bismuth, new_y_bismuth):
-    if 
+for x, bismuth_atten_coeff, iron_atten_coeff, wood_atten_coeff in zip(x_combined, new_y_bismuth, new_y_iron, new_y_wood):
+    if x == max(combined, key=lambda v: v[0])[1]:
+        print(f"Bismuth coeff: {bismuth_atten_coeff} | Iron coeff: {iron_atten_coeff} | Wood coeff: {wood_atten_coeff}")
+        break
 
 # plt.figure("log x-axis")
 # #plt.plot(np.log(x_val_bismuth), np.log(y_val_bismuth), 'o')
