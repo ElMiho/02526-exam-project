@@ -86,7 +86,7 @@ im, _, _, _ = np.linalg.lstsq(A, b)
 
 im = np.reshape(im, (N, N), order="F")
 
-predicted_im,predicted_bismuth,predicted_steel = predictions(im,att_coefs)
+predicted_im,predicted_bismuth,predicted_steel = predictions(resizedImage,att_coefs)
 
 confusion_steel = generate_confusion(predicted_steel,im,predicted_im,att_coefs[2])
 confusion_bismuth = generate_confusion(predicted_bismuth,im,predicted_im,att_coefs[1])
