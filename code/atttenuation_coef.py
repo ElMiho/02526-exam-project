@@ -94,7 +94,7 @@ plt.plot(
     [diff for x,diff in zip(x_combined, diff_yinterp) if x >= 10 and x <= 200], '-x', linewidth=3)
 plt.xlabel("Log X-Ray [keV]", fontsize=17)
 plt.ylabel("Attenuation coef [cm^(-1)]", fontsize=17)
-plt.legend(["Absolute difference between bismuth and iron"], fontsize="17")
+plt.legend(["Absolute difference between bismuth and iron"], fontsize="14")
 
 # plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
 plt.savefig(".././images/diff-attenuation-coef-bismuth-iron-zoom.png")
