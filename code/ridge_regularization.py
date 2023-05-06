@@ -18,24 +18,15 @@ theta = np.matrix(np.linspace(1 + 0, 1 + 180-2, 180 // 2))
 p=30
 A, _,_ ,_ = paralleltomo(n,theta,p)
 print(f"Condition number {np.linalg.cond(A)}")
+
+b = A @ x_input
+
 #Plot of pixels as a function of alpha
 n_alphas = 10
 alphas = np.logspace(10, -2, n_alphas)
-
 coefs = []
 for a in alphas:
-    ridge = sklin.Ridge(alpha=a, fit_intercept=False)
-    ridge.fit(A, b)
-    ridge.coef_ = ridge.coef_ / np.max(ridge.coef_)
-    coefs.append(ridge.coef_)
-
-
-b = A @ x_input
-lam = 0
-model = sklin.Ridge(alpha = lam)
-
-model.fit(A,b)
-x_ridge = model.coef_
-im_recov_ridge = np.reshape(x_ridge,(N,N))
-plt.imshow(im_recov_ridge)
-plt.show()
+    model = sklin.Ridge(alpha=a, fit_intercept=False)
+    model.fit(A, b)
+    model.coef_ = model.coef_ / np.max(model.coef_)
+    coefs.append(model.coef_)
