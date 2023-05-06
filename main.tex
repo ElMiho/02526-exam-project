@@ -162,6 +162,7 @@ From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coef
 
 \begin{figure}[H]
     \centering
+    \large{Attenuation coefficients} \\
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[scale=0.4]{images/attenuation_coef_zoom.png}
@@ -260,7 +261,7 @@ Sending a total of $m$ rays through the sample\footnote{Noting that every new an
 we can, by applying equation \ref{eq:for-one-ray}, construct the following linear system
 
 \begin{equation}
-    A \boldsymbol{x} = \boldsymbol{b},
+    \boldsymbol{A} \boldsymbol{x} = \boldsymbol{b},
 \end{equation}
 
 where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. 
