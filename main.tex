@@ -7,7 +7,6 @@
 \usepackage{listings}
 \usepackage{float}
 \usepackage{subcaption}
-\usepackage{hyperref}
 \usepackage{float}
 \usepackage{qtree}
 \usepackage[usenames,dvipsnames]{xcolor}
@@ -19,6 +18,7 @@
 \usepackage[top=2cm, bottom=2cm]{geometry}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage[hidelinks]{hyperref}
 
 \newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
 
@@ -54,7 +54,8 @@
 
 \title{
     Look inside the forest \\
-    \large X-ray and Computed Tomography
+    \large X-Ray and Computed Tomography \\
+    02526
 }
 \author{Hugo M. Nielsen (s214734) \and Mikael H. Hoffmann (s214753) \and Christian Valentin Kjær (s211469) \and Jacob Tuxen (s194572)}
 \date{7/5-2023}
@@ -102,13 +103,15 @@
 %% Tree is homogoen
 
 \section{Problem and background} 
-Due to hunting in forrests, shots are often found embedded in logs. This can impede the work of wood processing plants, as steel shots can discolour the wood and damage the saw blades. Therefore, one such plant, has reached out to us for guidance on designing a CT-scanner that can detect these shots before cutting the wood. \\
+\vspace*{-0.3\baselineskip}
+Due to hunting in forests, shots are often found embedded in logs. This can impede the work of wood processing plants, as steel shots can discolor the wood and damage the saw blades. Therefore, one such plant has reached out to us for guidance on designing a CT-scanner that can detect these shots before cutting the wood [4]. \\
 As CT-scanners are expensive to operate, the wood processing company would like to use as few angles and as few rays as possible for the CT-scanner while also minimizing the time, the model takes to reconstruct the image.
 
 
 \section{Data and experiments}
+\vspace*{-0.3\baselineskip}
 \subsection{Data - simulations}
-CT-scanners allow us to look inside objects, without cutting them open, by computing attenuation distributions over every angle used in the model and reconstruct the attenuation coefficients of the material from these distributions. This let's us identify compounds using the known attenuation coefficients of compounds we expect might be inside the object. \\ 
+CT-scanners allow us to look inside objects, without cutting them open, by computing attenuation distributions over every angle used in the model and reconstructing the attenuation coefficients of the material from these distributions. This lets us identify compounds using the known attenuation coefficients of compounds we expect might be inside the object. \\ 
 How representative these distributions are of the actual object depends on the number of rays used by the CT-scanner, the number of angles, corresponding to the number of unique distributions, and the resolution used for the image. This is illustrated here for two orthogonal angles:
 
 % Kan man kigge på den her figur og vide hvad den visualisere på 3 sekunder? Hvordan kan den forbedres? 
@@ -194,26 +197,23 @@ How representative these distributions are of the actual object depends on the n
     \caption[]{\small Illustration of the output of a CT scanner from two orthogonal angles, using different resolutions and number of rays. \emph{Leftmost:} many rays, good resolution. \emph{Center:} few rays, bad resolution. \emph{Rightmost:} few rays, good resolution}
     \label{fig:tikz-pictures}
 \end{figure} 
-Therefore, as part of constructing a fast and costefficient CT-scanner design, we simulate distributions using different numbers of rays and angles, and at different resolutions for use in determinening the best combination of these parameters. Moreover, we want our parameters to be robust towards noise and to different possible wood-shapes and shot-distributions and thus also simulate distributions varying these parameters.
+Therefore, as part of constructing a fast and cost-efficient CT-scanner design, we simulate distributions using different numbers of rays and angles, and at different resolutions for use in determining the best combination of these parameters. Moreover, we want our parameters to be robust towards noise and to different possible wood-shapes and shot-distributions and thus also simulate distributions varying these parameters.
 
 \subsection{Data - attenuation coefficients} \label{NISTDATA}
-From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{The attenuation coefficients for wood were calculated based on its percentagewise composition of carbon, hydrogen and oxygen - based on the source: ???.}. Based on this data we created the following plot (Figure \ref{fig:all-NIST-attenuation-coef-data}.) to illustrate how the ability to differentiate one compound from another depends on the energy used.
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.5]{images/all_NIST_attenuation_coef_data.png}
-    \caption{The blue box shows the typical energy range for commercial X-Ray sources.}
-    \label{fig:all-NIST-attenuation-coef-data}
-\end{figure} 
-\noindent Moreover, the attenuation coefficients are also a deciding factor in how intense the beam we receive after going through a log is\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.}, which is usefull information, as receiving a higher percentage of the input energy would imply more robustness towards noise.
+From [2] we collected the attenuation coefficients as a function of the photonic energy used for the following compounds: iron/steel, lead, bismuth and wood\footnote{The attenuation coefficients for wood were calculated based on its percentage-wise composition of carbon, hydrogen and oxygen - based on NIST.}. This allows us to illustrate how the ability to differentiate one compound from another depends on the photonic energy used, see section \ref{sec:energy-usage}.
+
+% Moreover, the attenuation coefficients are also a deciding factor in how intense the beam we receive after going through a log is[2], which is useful information, as receiving a higher percentage of the input energy would imply more robustness towards the noise.
 
 \section{Mathematical model}
+\vspace*{-0.3\baselineskip}
 \subsection{CT - attenuation distributions - discretization}\label{sec:CT-discretization}
-The goal is to reconstruct the object image from the attenuation distributions obtained from the CT-scanner. To that end we first need to understand, how a CT-scanner constructs the attenuation distributions and for that we need Lambert Beer's law. Lambert Beer's law let's us relate the attenuation of every point on a CT-scanner ray to a point in the CT-scanner output distribution in terms of a line integral\footnote{Lambert Beer's law is often stated in terms of an equivalent differential equation, see appendix \ref{appendix:lambert-beers-law}.}: \\
+The goal is to reconstruct the object image from the attenuation distributions obtained from the CT-scanner. To that end, we first need to understand, how a CT-scanner constructs the attenuation distributions and for that, we need Lambert Beer's law. Lambert Beer's law lets us relate the attenuation of every point on a CT-scanner ray to a point in the CT-scanner output distribution in terms of a line integral\footnote{Lambert Beer's law is often stated in terms of an equivalent differential equation, see appendix \ref{appendix:lambert-beers-law}.}: \\
 \begin{equation}
     \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right)
 \end{equation}
 Where the integration interval $[0, \ell_{\max}]$ is of the ray over the object of interest, $x$ the material dependant attenuation coefficient for every point along the ray through the material and $\log\left(\frac{I_0}{I}\right)$ the value of the point on the attenuation distribution i.e. the attenuation over the whole line. \\
 Solving this setup is, however, very complicated and we therefore make the simplification, that we can approximate the object as a finite number of homogeneous pixels\footnote{Homogeneous in terms of attenuation coefficients.}. \\
+\vspace*{-0.6\baselineskip}
 \begin{figure}[htbp]
     \centering
 \large{Discretization of model} \\
@@ -263,7 +263,7 @@ For a given ray $i$ we thus have: \\
     \sum_{j \in S_i} x_j \ell_{i, j} = \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right) = b_i,
 \end{equation} \\
 Where $S_i$ is the collection of pixels which are hit by ray $i$, $x_j$ is the attenuation coefficients (assumed to be constant for a single pixel), $\ell_{i, j}$ is, by the line integral interpretation, the length of ray $i$ through the $j$'th pixel in $S_i$. The number $b_i$ corresponds to $\log{(I_0 / I)}$. \\
-Sending a total of $m$ rays through the sample\footnote{Noting that every new angle induces a new number of rays which are included in the $m$}  and defining \\
+Sending a total of $m$ rays through the sample\footnote{Noting that every new angle induces a new number of rays which are included in the $m$.}  and defining \\
 \begin{equation}
     a_{i, j} = 
     \begin{cases}
@@ -274,99 +274,96 @@ Sending a total of $m$ rays through the sample\footnote{Noting that every new an
 We can, by applying equation \ref{eq:for-one-ray}, construct the following linear system
 \begin{equation}
     A \boldsymbol{x} = \boldsymbol{b} \label{eq:main}
-\end{equation} \\
-Where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. \\
-In most cases, $A$ is non-square and therefore many solution methods exists, the choice of solver has a large influence on the quality and speed of the solution\footnote{See section ???}. Therefore, in addition to finding the best physical parameters for our CT-scanner (number of angles, rays, resolution, photonic energy), we also explore the following different mathematical models for optimizing robustness towards noise and solver speed.
+\end{equation} 
+\noindent Where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. \\
+In most cases, $A$ is non-square and therefore many solution methods exists, the choice of solver has a large influence on the quality of the solution\footnote{See section \ref{sec:num-rays-angles-resolution}.}. Therefore, in addition to finding the best physical parameters for our CT-scanner (number of angles, rays, resolution, photonic energy), we also explore the following different mathematical models for optimizing robustness towards noise and solver speed.
 
 \subsubsection{Least squares}\label{sec:least-squares-text} 
 Least squares method is a method for solving systems of the form $A\mathbf{x} = \mathbf{b}$ by minimizing $||A\mathbf{x} - \mathbf{b}||_{2}^{2}$. This minimization problem naturally leads to the following solution for $x$:
 \begin{equation}
     \mathbf{x} = (A^\intercal A)^{-1} A^\intercal \mathbf{b}
 \end{equation}
-Which is well defined when $A$ has full row rank\footnote{See Appendix \ref{appendix:least-squares} for derivations}. In practice, noise is introduced in the attenuation distributions through various sources\footnote{Some sources ???}, which can interfere with the predicted attenuation coefficients when using least squares as a solution method, thus the need for ways to reduce the noise in the reconstruction.
+Which is well defined when $A$ has full row rank\footnote{See Appendix \ref{appendix:least-squares} for derivations.}. In practice, noise is introduced in the attenuation distributions through various sources\footnote{See Section \ref{sec:discussion}.}, which can interfere with the predicted attenuation coefficients when using least squares as a solution method, thus the need for ways to reduce the noise in the reconstruction.
 
 \subsubsection{Ridge regression}\label{sec:ridgre-regression-text}
-Ridge regression is one way of dealing with noise by adding a correction term $\alpha ||\mathbf{x}||_2^2$ to the minimization problem defined in least squares, that is $\min_x ||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha ||\mathbf{x}||_2^2$ for some $\alpha > 0$. This second term penalizes large values in the $\mathbf{x}$ vector and thus smoothens the resulting reconstruction, thereby reducing the noise. This formulation also has the advantage, that it always results in a well posed problem\footnote{See Appendix \ref{appendix:ridge-time} for derivations}.
+Ridge regression is one way of dealing with noise by adding a correction term $\alpha ||\mathbf{x}||_2^2$ to the minimization problem defined in least squares, that is $\min_x ||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha ||\mathbf{x}||_2^2$ for some $\alpha > 0$. This second term penalizes large values in the $\mathbf{x}$ vector and thus smoothens the resulting reconstruction, thereby reducing the noise. This formulation also has the advantage, that it always results in a well posed problem\footnote{See Appendix \ref{appendix:ridge-time} for derivations.}.
 
-%\paragraph{Lasso regression} Ridge regression will, penalize large outliers disproportionately more than non-outliers and can thus lead to a disproportionate smoothening of the image. A less aggressive alternative is thus to reduce the penalty by using the $L_1$ norm in stead, leading to the minimization problem $\min_x ||A\mathbf{x} - \mathbf{b}||_{2}^{2} + \alpha ||\mathbf{x}||_1$, with $\alpha$ defined as for ridge regression.
-\subsection{Validation - K means clustering}
-As described in the section above, our model assummes that the attenuation of any given grid cell can be perfectly described as the mean attenuation over the grid cell. This would cause the values of shots in logs to be diluted\footnote{With some dependence on the reduction block size parameter} and we thus need a method to quantitatively describe wether we can still differentiate shots in logs and the surrounding wood, for this we use K-means clustering. \\
-The K-means clustering method is used to cluster data into K classes. The method initializes k random centroids for each cluster. In each iteration, each data point is assigned to the cluster based on the minimal Euclidean distance to each centroid, until convergence is reached. At each iteration, the centroids are updated as the mean of the assigned data points. The algorithm stops when convergence is met, at which point the final output is the k cluster centroids and the assignment of each data point to a cluster. Since each shot embedded in the log can be interpreted as a cluster this method can use to predict where the shots are located. An illustration of the iterations is shown in figure \ref{Kmeans}. 
+%\paragraph{Lasso regression} Ridge regression will, penalize large outliers disproportionately more than non-outliers and can thus lead to a disproportionate smoothening of the image. A less aggressive alternative is thus to reduce the penalty by using the $L_1$ norm instead, leading to the minimization problem $\min_x ||A\mathbf{x} - \mathbf{b}||_{2}^{2} + \alpha ||\mathbf{x}||_1$, with $\alpha$ defined as for ridge regression.
+\subsection{Validation - K-means clustering}
+As described in the section above, our model assumes that the attenuation of any given grid cell can be perfectly described as the mean attenuation over the grid cell. This would cause the values of shots in logs to be diluted\footnote{With some dependence on the reduction block size parameter.} and we thus need a method to quantitatively describe whether we can still differentiate shots in logs and the surrounding wood, for this we use K-means clustering. \\\\
+The K-means clustering method is used to cluster data into K classes. The method initializes k random centroids for each cluster. In each iteration, each data point is assigned to the cluster based on the minimal Euclidean distance to each centroid, until convergence is reached. At each iteration, the centroids are updated as the mean of the assigned data points. The algorithm stops when convergence is met, at which point the final output is the k cluster centroids and the assignment of each data point to a cluster. Since each shot embedded in the log can be interpreted as a cluster this method can use to predict where the shots are located. An illustration of the iterations is shown in Figure \ref{Kmeans}. 
 \begin{figure}[H]
     \centering
     \includegraphics[width=10cm]{images/Kmeans.png}
-    \caption[Iterations in K-means clustering]{\small Iterations in K-means clustering.\footnote{Source: https://en.wikipedia.org/wiki/K-means-clustering}}
+    \caption[Iterations in K-means clustering]{\small Iterations in K-means clustering[3].}
     \label{Kmeans}
 \end{figure}
 
 
 \section{Experiments and results}
+\vspace*{-0.3\baselineskip}
 What follows are the optimal CT-model parameters, for the task of detecting shots in logs. 
 
 \subsection{Number of rays, angles and resolution}\label{sec:num-rays-angles-resolution} 
-After experimenting with different resolutions, number of rays and angles we found that the condition number of the matrix\footnote{Defined as in Section \ref{sec:CT-discretization}.} had a huge impact\footnote{See \url{https://blogs.mathworks.com/cleve/2017/07/17/what-is-the-condition-number-of-a-matrix/}.} especially since reality often involves some kind of noise. 
+After experimenting with different resolutions, number of rays and angles we found that the condition number of the matrix\footnote{Defined as in Section \ref{sec:CT-discretization}.} had a huge impact[1] especially since reality often involves some kind of noise. 
 We also found that a resolution lower than 17 px $\times$ 17 px resulted in the reconstructed image being very impacted by our setup, but still able to not only detect both the iron bullet and the bismuth but also differentiate between them as seen in Figure \ref{fig:two-different-images-for-4.1}. 
 
 \begin{figure}[H]
   \centering
+  \large{Automatic model results} \\
   \begin{subfigure}[b]{0.45\linewidth}
     \includegraphics[width=\linewidth]{images/total-picture-17-condA1-3.1025624256157716e+16-condA2-7.2959506476769125.png}
-    \caption{Shape: 17 $\times$ 17}
+    \caption{Shape: 17 px $\times$ 17 px.}
     \label{fig:sub1}
   \end{subfigure}
   \begin{subfigure}[b]{0.45\linewidth}
     \includegraphics[width=\linewidth]{images/total-picture-25-condA1-inf-condA2-49.46075340640841.png}
-    \caption{Shape: 25 $\times$ 25}
+    \caption{Shape: 25 px $\times$ 25 px.}
     \label{fig:sub2}
   \end{subfigure}
-  \caption{\small First row: matrix is nearly singular. Second row: condition number less than 200. Third row: K means based on the second row. The $\alpha$ values refers to Section \ref{sec:ridgre-regression-text}. }
+  \caption{\small \emph{First row}: matrix is nearly singular. \emph{Second row}: condition number less than 200. \emph{Third row}: K-means based on the second row. The regularization parameter $\alpha$ is as described in Section \ref{sec:ridgre-regression-text} - note that $\alpha = 0$ is simply least squares. The colors in the last row are calculated using K-means where yellow is iron and green is bismuth. The first row was generated using 16 rays and 36 angles uniformly distributed in the interval $[1,180]$. The second row was generated using 48 rays and all integer angles in the interval $[1, 180]$. }
   \label{fig:two-different-images-for-4.1}
 \end{figure}
 
-The colours in Figure \ref{fig:two-different-images-for-4.1} in the last row are calculated using K means where yellow is iron and green is bismuth. 
-
-In Figure \ref{fig:two-different-images-for-4.1} the first row was generated using 16 rays and 36 angles uniformly distributed in the interval $[1,180]$. The second row was generated using 48 rays and all integer angels in the interval $[1, 180]$. 
+\noindent For our setup, we therefore conclude that using a resolution of 25 px $\times$ 25 px with 48 rays and all integer angles in the interval $[1, 180]$ is best.
 
 \subsection{Energy usage}\label{sec:energy-usage}
 Based on the data described in section \ref{NISTDATA} we created the following plots (Figure \ref{fig:both-attenuation-coeff-plots}).
 \begin{figure}[H]
     \centering
     \large{Attenuation coefficients} \\
-    \includegraphics[scale=0.27]{images/combined-plot-attenuation.png}
+    \includegraphics[scale=0.26]{images/combined-plot-attenuation.png}
     \caption{\small Note that these images are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
     \label{fig:both-attenuation-coeff-plots}
 \end{figure} 
 
 \noindent Based on Figure \ref{fig:both-attenuation-coeff-plots} we see that the best configuration for the X-Ray for noticing a difference between wood, bismuth and iron is at 16.4 keV. We also note that the best configuration for noticing a difference between wood and iron is at 10 keV.  
 
-\section{Discussion}
-To reconstruct an image from the attenuation distributions by a CT-scanner well enough to spot some detail, in this case shots in logs, there are a lot of parameters that can be tuned and approximations to be made. The specific approximations and simplifications to make is a model specific task and all come with tradeoffs. 
+\subsection{Computational time}\label{sec:computational-time}
+There are various factors that influence the time it takes to compute $\mathbf{x}$ from equation \ref{eq:main}, such as the choice of solver, the number of rays used and the number of angles, but by far the most significant factor is the size, i.e. the resolution $N$ of our image\footnote[11]{See \url{https://github.com/ElMiho/02526-exam-project/tree/main/images-7-5-2023}.}. \\
+We have conducted several test runs on the HPC-server, highlighting the impact that the size of the system matrix has on the computational time required for the solvers\footnotemark[11].
 
-% Bedre formuleringer for dette afsnit eksisterer helt klart
-In Section \ref{sec:energy-usage} we saw that configuring the X-Ray to use 16.4 keV was the optimal energy level for differentiating between iron and bismuth using data from NIST. This however assumed that wood is completely homogeneous. Therefore, before using the system in the "real" world, a better value could be found by trying different energy levels in a concrete example and then deciding on a value.
-
-Due to the variability of the actual pixel values in a reconstructed image, the utilization of k-means clustering enables a system to effectively identify the location of the pellets, as the class label of the given pixel.
-
+\section{Discussion}\label{sec:discussion}
+\vspace*{-0.3\baselineskip}
+To reconstruct an image from the attenuation distributions by a CT-scanner well enough to spot some detail, in this case shots in logs, there are a lot of parameters that can be tuned and approximations to be made. The specific approximations and simplifications to make is a problem specific task and all choices come with trade-offs. \\
+In Section \ref{sec:energy-usage} we saw that configuring the X-Ray to use 16.4 keV was the optimal energy level for differentiating between iron and bismuth using data from NIST and that lower photonic energies, 10 keV, in general results in easier differentiation between wood and iron\footnote[12]{Since iron is more problematic, this could potentially be of more interest.}. Our model, however, has a lot of assumptions, including complete homogeneity of the wood and shots if noise is reduced and that the density can be approximately discretized into homogeneous grid cells. Therefore, before using the system in the "real" world, a better value could be found by trying different energy levels in a concrete example, with the ones found in this report as a baseline, and then deciding on a value. \\
+The utilization of K-means clustering enables a system to effectively identify the location of the shots, as the class label of the given pixel. Since the system has to detect whether a given area is wood, iron, or bismuth respectively. \\
+As described in Section \ref{sec:computational-time} the computational time acquired to solve equation (\ref{eq:main}) depends on the size of the system-matrix. Figure \ref{fig:two-different-images-for-4.1} illustrates that for a low resolution and hereby a low computational time the system is able to detect shots in the log, due to the low resolution this location is not precise. This implies a trade-off in computational time and precision in the location of the shots. 
+Due to the variability of the actual pixel values in a reconstructed image, the utilization of K-means clustering enables a system to effectively identify the location of the shots, as the class label of the given pixel. 
 
 \section{Conclude}
-This project provides a complete and automatic Python implementation for reconstructing the insides of a log with one or more embedded bismuth and steel shots, when given noisy attenuation distributions as outputted by a CT-scanner. It automatically assigns the label, i.e. whether it is air, wood, steel, or bismuth, of every pixel on the image with a given resolution and 
+\vspace*{-0.3\baselineskip}
+This project provides a complete and automatic Python implementation for reconstructing the insides of a log with one or more embedded bismuth and steel shots, when given noisy attenuation distributions as outputted by a CT-scanner\footnote[13]{For an easy guide-through see \textit{guide-through.py} in \url{https://github.com/ElMiho/02526-exam-project}}. It automatically assigns the label, i.e. whether it is air, wood, steel, or bismuth, of every pixel on the image with a given resolution. If the primary objective is to determine only whether a shot is embedded in a log, and not the specific location of the shot, then downsizing the system matrix can enable a faster solution. This concludes that it is possible to construct a robust system capable of solving a variety of tasks with the appropriate trade-offs in precision and computational efficiency.
 
+\newpage
+\section*{References}
+\begin{enumerate}
+    \item C. B. Moler, What is the Condition Number of a Matrix, \url{https://blogs.mathworks.com/cleve/2017/07/17/what-is-the-condition-number-of-a-matrix/}
+    \item U.S. Government, X-Ray Mass Attenuation Coefficients, \\ \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}
+    \item K-means clustering \url{https://en.wikipedia.org/wiki/K-means_clustering}
+    \item A. N. Christensen, Look inside the forest, document on learn
+\end{enumerate}
 
-\section{References}
-???
-
-
-\section{The list ??? SKAL SLETTES}
-\begin{itemize}
-    \item Vinkler, rays, N osv. argumentation --> konditionstal + confusion matrix
-    \item Ridge regression - test kvalitativ, confusion matrix og tid
-    \item Skrive rapport og sætte alt pænt op
-    \item References
-    \item Gå gennem punkterne på peergrade og sikre, at alt er godt
-    \item Assume normal distributions noise
-    \item Discuss: Computational time 
-    \item Downsampling and average in each block
-\end{itemize}
 
 
 
@@ -460,8 +457,13 @@ All code can also be found on GitHub \url{https://github.com/ElMiho/02526-exam-p
 \subsection{Validation}\label{appendix:validation}
 \lstinputlisting[language=Python, breaklines=true]{code/validation.py}
 
+\subsection{Exercise 2}\label{appendix:exercise-2}
+\lstinputlisting[language=Python, breaklines=true]{code/exercise2.py}
+
 \subsection{Code related to \ref{sec:num-rays-angles-resolution}}\label{appendix:num-rays-angles-resolution}
 \lstinputlisting[language=Python, breaklines=true]{code/number_of_rays_angles_and_resolution.py}
+
+\newpage
 
 \section{Plots and various conclusions}
 \subsection{Lambert beer and intensity}
