@@ -206,7 +206,7 @@ From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coef
     \caption{The blue box shows the typical energy range for commercial X-Ray sources.}
     \label{fig:all-NIST-attenuation-coef-data}
 \end{figure} 
-\noindent Moreover, the attenuation coefficients are also a deciding factor in how intense the beam we receive after going through a log is\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.}, which is usefull, as receiving a higher percentage of the input energy would imply more robustness towards noise.
+\noindent Moreover, the attenuation coefficients are also a deciding factor in how intense the beam we receive after going through a log is\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.}, which is usefull information, as receiving a higher percentage of the input energy would imply more robustness towards noise.
 
 \section{Mathematical model}
 \subsection{CT - attenuation distributions - discretization}\label{sec:CT-discretization}
@@ -317,9 +317,9 @@ Based on the data described in section \ref{NISTDATA} we created the following p
     \includegraphics[scale=0.3]{images/combined-plot-attenuation.png}
     \caption{\small Note that these images are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
     \label{fig:both-attenuation-coeff-plots}
-\end{figure}
+\end{figure} 
 
-Based on Figure \ref{fig:both-attenuation-coeff-plots} we see that the best configuration for the X-Ray for noticing a difference between wood, bismuth and iron is at 16.4 keV. We also note that the best configuration for noticing a difference between wood and iron is at 10 keV.  
+\noindent Based on Figure \ref{fig:both-attenuation-coeff-plots} we see that the best configuration for the X-Ray for noticing a difference between wood, bismuth and iron is at 16.4 keV. We also note that the best configuration for noticing a difference between wood and iron is at 10 keV.  
 
 Using Lambert Beer's law we also created the following plot which shows the ratio between input and output energy intensities depending on different energy levels (Figure \ref{fig:energy-vs-output-percentage}.). 
 
@@ -447,5 +447,8 @@ All code can also be found on GitHub \url{https://github.com/ElMiho/02526-exam-p
 
 \subsection{Validation}\label{appendix:validation}
 \lstinputlisting[language=Python, breaklines=true]{code/validation.py}
+
+\subsection{Code related to \ref{sec:num-rays-angles-resolution}}\label{appendix:num-rays-angles-resolution}
+\lstinputlisting[language=Python, breaklines=true]{code/number_of_rays_angles_and_resolution.py}
 
 \end{document}
