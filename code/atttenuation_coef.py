@@ -81,7 +81,7 @@ yinterp_wood = np.interp(xinterp, x_val_wood, y_val_wood)
 diff_coef = np.abs(yinterp_bismuth-yinterp_iron)
 
 
-plt.figure(2, figsize=(20, 8))
+plt.figure(2, figsize=(25, 5))
 x_combined = sorted(list(x_val_iron) + list(x_val_bismuth))
 new_y_bismuth = np.interp(x_combined, x_val_bismuth, y_val_bismuth)
 new_y_iron = np.interp(x_combined, x_val_iron, y_val_iron)
