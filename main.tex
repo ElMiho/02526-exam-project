@@ -16,6 +16,8 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.16}
 \usepackage{caption}
+\usepackage[top=2cm, bottom=2cm]{geometry}
+
 
 \newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
 
@@ -57,6 +59,10 @@
 
 \begin{document}
 \maketitle
+
+
+
+\newpage
 
 % ASSUMPTIONS
 %% Mean is normally distributed with mean = 0
@@ -157,8 +163,8 @@ How representative these distributions are of the actual object depends on the n
 \end{figure} 
 Therefore, as part of constructing a fast and costefficient CT-scanner design, we simulate distributions using different numbers of rays and angles, and at different resolutions for use in determinening the best combination of these parameters. Moreover, we want our parameters to be robust towards noise and to different possible wood-shapes and shot-distributions and thus also simulate distributions varying these parameters.
 
-\subsection{Data - attenuation coefficients}
-From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{Wood calculated based on its percentages of carbon, hydrogen and oxygen.}. Based on this we created the following plots (Figure \ref{fig:both-attenuation-coeff-plots}).
+\subsection{Data - attenuation coefficients} \label{NISTDATA}
+From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{The attenuation coefficients for wood were calculated based on its percentagewise composition of carbon, hydrogen and oxygen - based on the source: ???.}. Based on the 
 
 
 \section{Mathematical model}
@@ -212,43 +218,59 @@ color(100bp)=(blue!50)
     \caption[]{\small Illustration of discretized model and zoombox illustrating the effect of assuming constant attenuation for every grid cell of the discrete object - note that color is used to illustrate a varying density over the object}
     \label{fig:tikz-pictures2}
 \end{figure} \\
-Then by the homogeneity of every pixel, the line-integral over that pixel is just the product of the length of the line over that pixel and it's attenuation coefficient.
-
-
-
-
-% Let every pixel of the image have an unknown, but uniform, attenuation such that we by the discretization of Lambert Beer's law\footnote{See appendix \ref{appendix:simplification-discreatization}} can set up the following model in which we start by slicing the sample into a $N \times N$ grid each grid length $D = L/N$ ($L$: length of sample). This means that $\boldsymbol{x} \in \mathbb{R}^n, n = N^2$.
-
-For a given ray $i$ we thus have:
-
+Then by the homogeneity of every pixel, the line-integral over that pixel is just the product of the length of the line over that pixel and it's attenuation coefficient. \\
+For a given ray $i$ we thus have: \\
 \begin{equation}\label{eq:for-one-ray}
     \sum_{j \in S_i} x_j \ell_{i, j} = \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right) = b_i,
-\end{equation}
-
-Where $S_i$ is the collection of pixels which are hit by ray $i$, $x_j$ is the attenuation coefficients (assumed to be constant for a single pixel), $\ell_{i, j}$ is, by the line integral interpretation, the length of ray $i$ through the $j$'th pixel in $S_i$. The number $b_i$ corresponds to $\log{(I_0 / I)}$. 
-
-Sending a total of $m$ rays through the sample\footnote{Noting that every new angle induces a new number of rays which are included in the $m$}  and defining
-
+\end{equation} \\
+Where $S_i$ is the collection of pixels which are hit by ray $i$, $x_j$ is the attenuation coefficients (assumed to be constant for a single pixel), $\ell_{i, j}$ is, by the line integral interpretation, the length of ray $i$ through the $j$'th pixel in $S_i$. The number $b_i$ corresponds to $\log{(I_0 / I)}$. \\
+Sending a total of $m$ rays through the sample\footnote{Noting that every new angle induces a new number of rays which are included in the $m$}  and defining \\
 \begin{equation}
     a_{i, j} = 
     \begin{cases}
         \ell_{i, j} & \text{if beam $i$ hits pixel $j$} \\
         0 & \text{otherwise,}
     \end{cases}
-\end{equation}
-
-we can, by applying equation \ref{eq:for-one-ray}, construct the following linear system
-
+\end{equation} \\
+We can, by applying equation \ref{eq:for-one-ray}, construct the following linear system
 \begin{equation}
-    \boldsymbol{A} \boldsymbol{x} = \boldsymbol{b},
-\end{equation}
+    A \boldsymbol{x} = \boldsymbol{b} \label{eq:main}
+\end{equation} \\
+Where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. \\
+In most cases, $A$ is non-square and therefore many solution methods exists, the choice of solver has a large influence on the quality and speed of the solution\footnote{??? Reference to such solution methods and the fact that ???}. Therefore, in addition to finding the best physical parameters for our CT-scanner (number of angles, rays, resolution, photonic energy), we also explore the following different mathematical models for optimizing robustness towards noise and solver speed.
 
-where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. 
+\paragraph{Least squares:} Least squares method is a method for solving systems of the form $A\mathbf{x} = \mathbf{b}$ by minimizing $||A\mathbf{x} - \mathbf{b}||_{2}^{2}$. This minimization problem naturally leads to the following solution for $x$:
+\begin{equation}
+    \mathbf{x} = (A^\intercal A)^{-1} A^\intercal \mathbf{b}
+\end{equation}
+Which is well defined when $A$ has full row rank\footnote{See appendix ??? for derivations}. In practice, noise is introduced in the attenuation distributions through various sources\footnote{Some sources ???}, which can interfere with the predicted attenuation coefficients when using least squares as a solution method, thus the need for ways to reduce the noise in the reconstruction.
+
+\paragraph{Ridge regression} Ridge regression is one way of dealing with noise by adding a correction term $\alpha ||\mathbf{x}||_2^2$ to the minimization problem defined in least squares, that is $\min_x ||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha ||\mathbf{x}||_2^2$ for some $\alpha > 0$. This second term penalizes large values in the $\mathbf{x}$ vector and thus smoothens the resulting reconstruction, thereby reducing the noise. This formulation also has the advantage, that it always results in a well posed problem\footnote{See appendix ??? for derivations}.
+
+\paragraph{Lasso regression} Ridge regression will, penalize large outliers disproportionately more than non-outliers and can thus lead to a disproportionate smoothening of the image. A less aggressive alternative is thus to reduce the penalty by using the $L_1$ norm in stead, leading to the minimization problem $\min_x ||A\mathbf{x} - \mathbf{b}||_{2}^{2} + \alpha ||\mathbf{x}||_1$, with $\alpha$ defined as for ridge regression.
+
+
+\subsection{Validation - K means clustering}
+The K-means clustering method is used to cluster data into K classes. The method initializes k random centroids for each cluster. In each iteration, each data point is assigned to the cluster based on the minimal Euclidean distance to each centroid, until convergence is reached. At each iteration, the centroids are updated as the mean of the assigned data points. The algorithm stops when convergence is met, at which point the final output is the k cluster centroids and the assignment of each data point to a cluster.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10cm]{images/Kmeans.png}
+    \caption[Iterations in K-means clustering]{https://en.wikipedia.org/wiki/K-means_clustering \footnotemark }
+    \label{Kmeans}
+\end{figure}
+
+
+
 
 \section{Experiments and results}
-\subsection{Optimal CT-model parameters}
-???
-\subsection{Energy usage}
+What follows are the optimal CT-model parameters, for the task of detecting shots in logs, and the experiments used to identify them. 
+
+\subsection{Number of rays, angles and resolution} 
+
+Something wise\footnote{See \url{https://drive.google.com/drive/folders/1LJ_m7pny6Ikl0HH2YcMOjl5B7i967D1S?usp=sharing}}
+
+\subsection{Energy usage}\label{sec:energy-usage}
+Based on the data described in section \ref{NISTDATA} we created the following plots (Figure \ref{fig:both-attenuation-coeff-plots}).
 \begin{figure}[H]
     \centering
     \large{Attenuation coefficients} \\
@@ -270,12 +292,21 @@ where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is 
 
 Based on Figure \ref{fig:attenuation-coef-zoom} and Figure \ref{fig:diff-attenuation-coef-bismuth-iron} we see that the best value for noticing a difference between wood, bismuth and iron is at 16.4 keV. 
 
+Using Lambert Beer's law we also created the following plot which shows the ratio between input and output energy intensities depending on different energy levels (Figure \ref{fig:energy-vs-output-percentage}.). 
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.35]{images/energy-vs-output-percentage.png}
+    \caption{The ratio between energy intensities as a function of the energy level measured in keV.}
+    \label{fig:energy-vs-output-percentage}
+\end{figure}
 
 \section{Discussion}
 To reconstruct an image from the attenuation distributions by a CT-scanner well enough to spot some detail, in this case shots in logs, there are a lot of parameters that can be tuned and approximations to be made. The specific approximations and simplifications to make is a model specific task and all come with tradeoffs.
 ???
 
+% Bedre formuleringer for dette afsnit eksisterer helt klart
+In Section \ref{sec:energy-usage} we saw that configuring the X-Ray to use 16.4 keV was the optimal energy level for differentiating between iron and bismuth using data from NIST. This however assumed that wood is completely homogeneous and therefore, before using the system in the "real" world, a better value could be found by trying different energy levels in a concrete example and then deciding on a value. 
 
 \section{Conclude}
 ???
@@ -285,7 +316,11 @@ To reconstruct an image from the attenuation distributions by a CT-scanner well 
     \item Vinkler, rays, N osv. argumentation --> konditionstal + confusion matrix
     \item Ridge regression - test kvalitativ, confusion matrix og tid
     \item Skrive rapport og sætte alt pænt op
+    \item References
     \item Gå gennem punkterne på peergrade og sikre, at alt er godt
+    \item Assume normal distributions noise
+    \item Discuss: Computational time 
+    \item Downsampling and average in each block
 \end{itemize}
 
 
