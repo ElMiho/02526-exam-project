@@ -25,7 +25,7 @@ def return_circle(im):
     n,m = im.shape
     return_im = np.zeros((n,m))
     c = n//2
-    radius = c - 1
+    radius = c - 5
     for i in range(n):
         for j in range(m):
             if ((i - c)**2 + (j - c)**2) < radius**2:   #Area to evaluate
@@ -85,9 +85,9 @@ def predictions(recovered_image, original_image, attenuations):
                     elif(original_image[i,j]==attenuations[2]): # Actual value steel
                         confusion_matrix[4,4] += 1
 
-    return predicted_image,confusion_matrix
+    return confusion_matrix
 
-def downsized_unique_value(resized_im,attenuations):
+def downsized_unique_value(resized_im,attenuations, as_idx=False):
     # Input: resized image, attenuations in the order wood, bismuth, steel
     # Returns: The most likely value of the resized image
     n,m = resized_im.shape
@@ -101,77 +101,153 @@ def downsized_unique_value(resized_im,attenuations):
                 y = np.abs([x-attenuations[0],x-attenuations[1],x-attenuations[2]]) #Calculate max-likelyhood
                 idx = np.argmin(y)                          # Predicted class
                 im_unique_val[i,j] = attenuations[idx]    # Add value to image
+                if as_idx:
+                    im_unique_val[i,j] = idx
     return im_unique_val
 
-testImage = np.load("./testimage.npy")
 
-downSamplingFactor = 100
-N = int(testImage.shape[1]/downSamplingFactor)
-resizedImage = ski.measure.block_reduce(testImage, block_size=downSamplingFactor, func=np.mean)
+def calculate_conf_matrix(recovered_image, original_image, N):
 
-# Convert the image to a numpy array
-print(f"Image shape: ", resizedImage.shape)
-image_array = return_circle(resizedImage)
+    image_array = return_circle(recovered_image)
 
-# Reshape the array to a 2D array of pixels
-pixel_values = image_array.reshape((-1, 1))
+    # Reshape the array to a 2D array of pixels
+    pixel_values = image_array.reshape((-1, 1))
 
-# Perform k-means clustering with 4 clusters
-NUM_CLUSTERS = 4
-kmeans = KMeans(n_clusters=NUM_CLUSTERS, random_state=628).fit(pixel_values)
+    # Perform k-means clustering with 4 clusters
+    NUM_CLUSTERS = 4
+    kmeans = KMeans(n_clusters=NUM_CLUSTERS, random_state=628).fit(pixel_values)
 
-# Get the labels and centroid values for each pixel
-labels = kmeans.labels_
-centroids = kmeans.cluster_centers_
+    # Get the labels and centroid values for each pixel
+    labels = kmeans.labels_
+    centroids = kmeans.cluster_centers_
 
-# Get the mean value in each cluster
-cluster_values = []
-for i in range(kmeans.n_clusters):
-    mask = labels == i
-    cluster_pixels = pixel_values[mask]
-    cluster_mean = np.mean(cluster_pixels)
-    cluster_values.append(cluster_mean)
+    # Get the mean value in each cluster
+    cluster_values = []
+    for i in range(kmeans.n_clusters):
+        mask = labels == i
+        cluster_pixels = pixel_values[mask]
+        cluster_mean = np.mean(cluster_pixels)
+        cluster_values.append(cluster_mean)
 
-print("Cluster values: ", sorted(cluster_values))
+    cluster_values = sorted(cluster_values)
+    att_coefs = cluster_values[1:]
+    
+    predicted_im = labels.reshape(N,N)
+    
+    #im_original_unique = downsized_unique_value(original_image, att_coefs)
 
-predicted_im = labels.reshape(50,50)
-plt.imshow(predicted_im)
-# plt.show()
+    #confusion_matrix = predictions(predicted_im,im_original_unique,att_coefs)
+
+    return predicted_im
+
+def kmean_clust(resized_im):
+    image_array = return_circle(resized_im)
+    N = image_array.shape[0]
+
+    # Reshape the array to a 2D array of pixels
+    pixel_values = image_array.reshape((-1, 1))
+
+    # Perform k-means clustering with 4 clusters
+    NUM_CLUSTERS = 4
+    kmeans = KMeans(n_clusters=NUM_CLUSTERS, random_state=628).fit(pixel_values)
+
+    # Get the labels and centroid values for each pixel
+    labels = kmeans.labels_
+
+    # Get the mean value in each cluster
+    cluster_values = []
+    for i in range(kmeans.n_clusters):
+        mask = labels == i
+        cluster_pixels = pixel_values[mask]
+        cluster_mean = np.mean(cluster_pixels)
+        cluster_values.append(cluster_mean)
+
+    cluster_values = sorted(cluster_values)
+    att_coefs = cluster_values[1:]
+    
+    return labels.reshape(N,N), att_coefs
+
+def add_noise_float(b, mean_noise, std_noise):
+    return b + np.random.normal(loc=mean_noise, scale=std_noise, size=b.shape)
+
+# def add_noise_percent(b, mean_percent=50, std_percent=70):
+#     return add_noise_float(b, np.mean(b)*mean_percent/100, np.mean(b)*std_percent/100)
+
+if __name__ == "__main__":
+    testImage = np.load("./testimage.npy")
+
+    downSamplingFactor = 100
+    N = int(testImage.shape[1]/downSamplingFactor)
+    resizedImage = ski.measure.block_reduce(testImage, block_size=downSamplingFactor, func=np.mean)
+
+    orignal_image_unique, att_coefs_org = kmean_clust(resizedImage)
+
+    x = resizedImage.flatten(order="F")
+
+    A, _, _, _ = paralleltomo(N)
+    
+    b = A@x
+
+    noise_b = add_noise_float(b, 0, 0.0001)
+    x_recov,_,_,_ = np.linalg.lstsq(A, noise_b)
+    
+    
+    recov_im = x_recov.reshape((N,N), order="F")
+
+    recov_predict,att_recov = kmean_clust(recov_im)
+
+    recov_predict_unique = downsized_unique_value(recov_predict,att_recov)
+    att_coef_recov = np.unique(recov_predict_unique)
+    
+    print(f"Att original{att_coefs_org}\n")
+    print(f"Att recovered{att_recov}\n")
+    print(f"Att recovered_unique{att_coef_recov}")
 
 
-shape = testImage.shape
-#testImage = testImage.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
+    #print(confusion_matrix)
+    plt.figure("Im original unique")
+    plt.imshow(orignal_image_unique)
 
-unique_values = sorted(cluster_values)
-# Wood, Iron, Bismuth
-print("Air: {} | Wood: {} | Iron: {} | Bismuth: {}".format(*unique_values))
-att_coefs = unique_values[1:]
-downSamplingFactor = 100
+    plt.figure("Im recovered k means")
+    plt.imshow(recov_predict)
 
-N = int(testImage.shape[1]/downSamplingFactor)
-resizedImage = ski.measure.block_reduce(testImage, block_size=downSamplingFactor, func=np.mean)
+    plt.figure("Im recovered unique")
+    plt.imshow(recov_predict_unique)
 
-x_input = resizedImage.flatten(order="F")
+    plt.show()
 
-A,_,_,_ = paralleltomo(N)
 
-b = A @ x_input
 
-im_recov, _, _, _ = np.linalg.lstsq(A, b)
 
-im_recov = np.reshape(im_recov, (N, N), order="F")
 
-im_original_unique = downsized_unique_value(resizedImage, att_coefs)
+    # Convert the image to a numpy array
+    # print(f"Image shape: ", resizedImage.shape)
+    # image_array = return_circle(resizedImage)
 
-predicted_im,confusion_matrix, = predictions(im_recov,im_original_unique,att_coefs)
-print(confusion_matrix)
-plt.figure("Im original unique")
-plt.imshow(im_original_unique)
+    # # Reshape the array to a 2D array of pixels
+    # pixel_values = image_array.reshape((-1, 1))
 
-plt.figure("Im recov")
-plt.imshow(im_recov)
+    # # Perform k-means clustering with 4 clusters --> Air, Wood, Iron, Bismuth
+    # NUM_CLUSTERS = 4
+    # kmeans = KMeans(n_clusters=NUM_CLUSTERS, random_state=628).fit(pixel_values)
 
-plt.figure("Predicted im")
-plt.imshow(predicted_im)
-plt.show()
-print(np.unique(im_original_unique))
+    # # Get the labels and centroid values for each pixel
+    # labels = kmeans.labels_
+    # centroids = kmeans.cluster_centers_
+
+    # # Get the mean value in each cluster
+    # cluster_values = []
+    # for i in range(kmeans.n_clusters):
+    #     mask = labels == i
+    #     cluster_pixels = pixel_values[mask]
+    #     cluster_mean = np.mean(cluster_pixels)
+    #     cluster_values.append(cluster_mean)
+
+    # print("Cluster values: ", sorted(cluster_values))
+    # att_coefs = sorted(cluster_values)[1:]
+
+    # predicted_im = labels.reshape(N,N)
+    
+    # im_original_unique = downsized_unique_value(resizedImage, att_coefs)
+
+    # confusion_matrix = predictions(predicted_im,im_original_unique,att_coefs)

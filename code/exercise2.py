@@ -58,6 +58,44 @@ def threshold(image, color='gray'):
 
     return image
 
+def kmean_clust(resized_im):
+    image_array = return_circle(resized_im)
+
+    # Reshape the array to a 2D array of pixels
+    pixel_values = image_array.reshape((-1, 1))
+
+    # Perform k-means clustering with 4 clusters
+    NUM_CLUSTERS = 4
+    kmeans = KMeans(n_clusters=NUM_CLUSTERS, random_state=628).fit(pixel_values)
+
+    # Get the labels and centroid values for each pixel
+    labels = kmeans.labels_
+
+    # Get the mean value in each cluster
+    cluster_values = []
+    for i in range(kmeans.n_clusters):
+        mask = labels == i
+        cluster_pixels = pixel_values[mask]
+        cluster_mean = np.mean(cluster_pixels)
+        cluster_values.append(cluster_mean)
+
+    cluster_values = sorted(cluster_values)
+    att_coefs = cluster_values[1:]
+    
+    return labels.reshape(N,N), att_coefs
+
+def return_circle(im):
+    n,m = im.shape
+    return_im = np.zeros((n,m))
+    c = n//2
+    radius = c - 1
+    for i in range(n):
+        for j in range(m):
+            if ((i - c)**2 + (j - c)**2) < radius**2:   #Area to evaluate
+                return_im[i,j] = im[i,j]
+    return return_im
+
+
 testImage = np.load('testImage.npy')
 
 max_pixel = np.max(testImage)
@@ -125,23 +163,26 @@ picture1 = np.reshape(picture1, (50,50), order="F")
 ## Plot of different means
 # plt.figure(2)
 
-std_percentages = list(range(0,9))
+std_percentages = list(range(0,9,2))
 thetas = [
     np.matrix(np.linspace(1 + 0, 1 + 180-step_size, 180 // step_size)) for step_size in range(1,6)
 ]
 
 down_sampling_factors = [
-    200, 150, 100, 50
+    200, 150, 100
 ]
 
 n_alphas = 10
-alphas = np.logspace(3, -2, n_alphas)
+# alphas = np.logspace(3, -2, n_alphas)
+alphas = [1/2, 1, 10]
 
 for a in alphas:
     index = 1
     for down_scaling_factor in tqdm(down_sampling_factors):
-        resizedImage = ski.measure.block_reduce(testImage, block_size=down_scaling_factor)
+        resizedImage = ski.measure.block_reduce(testImage, block_size=down_scaling_factor, func=np.mean)
         N, _N = resizedImage.shape
+
+        orignal_image_unique, att_coefs = kmean_clust(resizedImage)
 
         d_vals = [
             np.sqrt(2) * N
@@ -182,12 +223,17 @@ for a in alphas:
 
                             im_recov_ridge = np.reshape(model_ridge.coef_,(N,N), order = "F")
                             # im_recov_lasso = np.reshape(model_lasso.coef_,(N,N), order = "F")
+
+                            predicted_image = kmean_clust(im_recov_ridge)
+
+
                             
                             plt.imshow(im_recov_ridge)
                         
+                        folder = "images"
                         print(f"Time taken for plotting: {time.time() - start_time:.4f}s")
                         plt.suptitle(f"N={N}, cond={condA}, theta_shape={theta.shape}, p={p_val}, d={round(d_val,4)}, down_scaling_factor={down_scaling_factor}, index={index}", fontsize=12)
-                        plt.savefig(f"./images/N={N}, cond={condA}, theta_shape={theta.shape}, p={p_val}, d={round(d_val,4)}, down_scaling_factor={down_scaling_factor}, alpha={a}, time={time.time() - start_time}, index={index}.png")
+                        plt.savefig(f"./{folder}/N={N}, cond={condA}, theta_shape={theta.shape}, p={p_val}, d={round(d_val,4)}, down_scaling_factor={down_scaling_factor}, alpha={a}, time={time.time() - start_time}, index={index}.png")
 
                     break
                 break

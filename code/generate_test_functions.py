@@ -78,3 +78,6 @@ def generate_im(n,att_coefs,num_pellets,pellet_size):
         else:
             im = add_pellet(im,loc, pellet_size, att_coefs[2])
     return im
+
+
+

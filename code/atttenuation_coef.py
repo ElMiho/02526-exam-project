@@ -139,8 +139,21 @@ plt.legend(["Iron", "Bismuth", "Wood"], fontsize="17")
 
 plt.savefig(".././images/attenuation_coef_zoom.png")
 plt.close()
-# %%
 
 
+x_combined = sorted(list(x_val_iron) + list(x_val_wood))
+new_y_iron = np.interp(x_combined, x_val_iron, y_val_iron)
+new_y_wood = np.interp(x_combined, x_val_wood, y_val_wood)
 
+diff_yinterp = np.abs(new_y_wood - new_y_iron)
+plt.figure("diff", figsize=(7,7))
+plt.plot(
+    np.log([x for x in x_combined if x >= 10 and x <= 200]), 
+    [diff for x,diff in zip(x_combined, diff_yinterp) if x >= 10 and x <= 200], '-x', linewidth=3)
+plt.xlabel("Log X-Ray [keV]", fontsize=16)
+plt.ylabel(r"Attenuation coef [$cm^{-1}$]", fontsize=16)
+plt.legend(["Absolute difference between wood and iron"], fontsize="14", loc="upper right")
 
+# plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
+plt.savefig(".././images/diff-attenuation-coef-wood-iron-zoom.png")
+plt.close()
