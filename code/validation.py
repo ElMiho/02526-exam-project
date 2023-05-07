@@ -105,18 +105,11 @@ def downsized_unique_value(resized_im,attenuations):
 
 testImage = np.load("./testimage.npy")
 
-unique_values = sorted(np.unique(testImage))
-
-NUM_CLUSTERS = 4
-# kmeans = KMeans(n_clusters=NUM_CLUSTERS)
-
 downSamplingFactor = 100
 N = int(testImage.shape[1]/downSamplingFactor)
 resizedImage = ski.measure.block_reduce(testImage, block_size=downSamplingFactor, func=np.mean)
 
 # Convert the image to a numpy array
-# image_array = resizedImage
-
 print(f"Image shape: ", resizedImage.shape)
 image_array = return_circle(resizedImage)
 
@@ -124,6 +117,7 @@ image_array = return_circle(resizedImage)
 pixel_values = image_array.reshape((-1, 1))
 
 # Perform k-means clustering with 4 clusters
+NUM_CLUSTERS = 4
 kmeans = KMeans(n_clusters=NUM_CLUSTERS, random_state=628).fit(pixel_values)
 
 # Get the labels and centroid values for each pixel
@@ -142,57 +136,42 @@ print("Cluster values: ", sorted(cluster_values))
 
 predicted_im = labels.reshape(50,50)
 plt.imshow(predicted_im)
-plt.show()
+# plt.show()
 
 
 shape = testImage.shape
 #testImage = testImage.reshape(scipy.product(shape[:2]), shape[2]).astype(float)
 
+unique_values = sorted(cluster_values)
+# Wood, Iron, Bismuth
+print("Air: {} | Wood: {} | Iron: {} | Bismuth: {}".format(*unique_values))
+att_coefs = unique_values[1:]
+downSamplingFactor = 100
 
+N = int(testImage.shape[1]/downSamplingFactor)
+resizedImage = ski.measure.block_reduce(testImage, block_size=downSamplingFactor, func=np.mean)
 
-# print('finding clusters')
-# codes, dist = scipy.cluster.vq.kmeans(resizedImage, NUM_CLUSTERS)
-# print('cluster centres:\n', codes)
-# print(f"Dist: {dist}")
+x_input = resizedImage.flatten(order="F")
 
-# vecs, dist = scipy.cluster.vq.vq(resizedImage, codes)         # assign codes
-# counts, bins = scipy.histogram(vecs, len(codes))    # count occurrences
+A,_,_,_ = paralleltomo(N)
 
-# index_max = scipy.argmax(counts)                    # find most frequent
-# peak = codes[index_max]
-# colour = binascii.hexlify(bytearray(int(c) for c in peak)).decode('ascii')
-# print('most frequent is %s (#%s)' % (peak, colour))
-# plt.show()
+b = A @ x_input
 
-# # Wood, Iron, Bismuth
-# print("Air: {} | Wood: {} | Iron: {} | Bismuth: {}".format(*unique_values))
-# att_coefs = unique_values[1:]
-# downSamplingFactor = 100
+im_recov, _, _, _ = np.linalg.lstsq(A, b)
 
-# N = int(testImage.shape[1]/downSamplingFactor)
-# resizedImage = ski.measure.block_reduce(testImage, block_size=downSamplingFactor, func=np.mean)
+im_recov = np.reshape(im_recov, (N, N), order="F")
 
-# x_input = resizedImage.flatten(order="F")
+im_original_unique = downsized_unique_value(resizedImage, att_coefs)
 
-# A,_,_,_ = paralleltomo(N)
+predicted_im,confusion_matrix, = predictions(im_recov,im_original_unique,att_coefs)
+print(confusion_matrix)
+plt.figure("Im original unique")
+plt.imshow(im_original_unique)
 
-# b = A @ x_input
+plt.figure("Im recov")
+plt.imshow(im_recov)
 
-# im_recov, _, _, _ = np.linalg.lstsq(A, b)
-
-# im_recov = np.reshape(im_recov, (N, N), order="F")
-
-# im_original_unique = downsized_unique_value(resizedImage, att_coefs)
-
-# predicted_im,confusion_matrix, = predictions(im_recov,im_original_unique,att_coefs)
-# print(confusion_matrix)
-# plt.figure("Im original unique")
-# plt.imshow(im_original_unique)
-
-# plt.figure("Im recov")
-# plt.imshow(im_recov)
-
-# plt.figure("Predicted im")
-# plt.imshow(predicted_im)
-# plt.show()
-# print(np.unique(im_original_unique))
+plt.figure("Predicted im")
+plt.imshow(predicted_im)
+plt.show()
+print(np.unique(im_original_unique))
