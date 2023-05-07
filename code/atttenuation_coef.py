@@ -163,3 +163,13 @@ plt.legend(["Absolute difference between wood and iron"], fontsize="14", loc="up
 
 plt.savefig(".././images/combined-plot-attenuation.png")
 plt.close()
+
+plt.figure(3)
+plt.plot(np.log(x_val_bismuth), y_val_bismuth)
+plt.plot(np.log(x_val_iron), y_val_iron)
+plt.plot(np.log(x_val_wood), y_val_wood)
+plt.xlabel("Log X-Ray [keV]")
+plt.ylabel(r"Attenuation coef [$cm^{-1}$]")
+plt.legend(["Bismuth", "Iron", "Wood"])
+plt.savefig(".././images/all_NIST_attenuation_coef_data.png")
+plt.close()

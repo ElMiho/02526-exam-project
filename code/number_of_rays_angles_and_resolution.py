@@ -37,34 +37,19 @@ b_noise = add_noise_float(b, 0, 0.0001)
 
 # Alpha values for ridge and lasso
 alphas = [0, 1/2, 1, 5, 
-          10, 20, 25,
-          40, 50, 60]
+          10, 20, 25, 30,
+          40, 50, 60, 70]
 
 plt.figure("Different alpha values - ridge")
 for idx, a in enumerate(alphas):
-    plt.subplot(4, 4, idx+1)
+    plt.subplot(3, 4, idx+1)
     plt.title(f"alpha = {a}")
 
     model_ridge = sklin.Ridge(alpha=a, fit_intercept=False)
     model_ridge.fit(A, b_noise)
-    im_recov_ridge = np.reshape(model_ridge.coef_,(N,N), order = "F")
+    im_recov_ridge = np.reshape(model_ridge.coef_, (N,N), order = "F")
 
     kmeans_image, _ = validation.kmean_clust(im_recov_ridge)
-
-    plt.imshow(kmeans_image)
-
-# plt.show()
-
-plt.figure("Different alpha values - lasso")
-for idx, a in enumerate(alphas):
-    plt.subplot(4, 4, idx+1)
-    plt.title(f"alpha = {a}")
-
-    model_lasso = sklin.Lasso(alpha=a, fit_intercept=False)
-    model_lasso.fit(A, b_noise)
-    im_recov_lasso = np.reshape(model_lasso.coef_,(N,N), order = "F")
-
-    kmeans_image, _ = validation.kmean_clust(im_recov_lasso)
 
     plt.imshow(kmeans_image)
 
