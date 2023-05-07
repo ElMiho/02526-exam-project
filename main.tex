@@ -60,8 +60,6 @@
 \begin{document}
 \maketitle
 
-
-
 \newpage
 
 % ASSUMPTIONS
@@ -168,7 +166,7 @@ From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coef
 
 
 \section{Mathematical model}
-\subsection{CT - attenuation distributions - discretization}
+\subsection{CT - attenuation distributions - discretization}\label{sec:CT-discretization}
 The goal is to reconstruct the object image from the attenuation distributions obtained from the CT-scanner. To that end we first need to understand, how a CT-scanner constructs the attenuation distributions and for that we need Lambert Beer's law. Lambert Beer's law let's us relate the attenuation of every point on a CT-scanner ray to a point in the CT-scanner output distribution in terms of a line integral\footnote{Lambert Beer's law is often stated in terms of an equivalent differential equation, see appendix \ref{appendix:lambert-beers-law}.}: \\
 \begin{equation}
     \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right)
@@ -247,11 +245,9 @@ Which is well defined when $A$ has full row rank\footnote{See appendix ??? for d
 
 \paragraph{Ridge regression} Ridge regression is one way of dealing with noise by adding a correction term $\alpha ||\mathbf{x}||_2^2$ to the minimization problem defined in least squares, that is $\min_x ||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha ||\mathbf{x}||_2^2$ for some $\alpha > 0$. This second term penalizes large values in the $\mathbf{x}$ vector and thus smoothens the resulting reconstruction, thereby reducing the noise. This formulation also has the advantage, that it always results in a well posed problem\footnote{See appendix ??? for derivations}.
 
-\paragraph{Lasso regression} Ridge regression will, penalize large outliers disproportionately more than non-outliers and can thus lead to a disproportionate smoothening of the image. A less aggressive alternative is thus to reduce the penalty by using the $L_1$ norm in stead, leading to the minimization problem $\min_x ||A\mathbf{x} - \mathbf{b}||_{2}^{2} + \alpha ||\mathbf{x}||_1$, with $\alpha$ defined as for ridge regression.
-
-
+%\paragraph{Lasso regression} Ridge regression will, penalize large outliers disproportionately more than non-outliers and can thus lead to a disproportionate smoothening of the image. A less aggressive alternative is thus to reduce the penalty by using the $L_1$ norm in stead, leading to the minimization problem $\min_x ||A\mathbf{x} - \mathbf{b}||_{2}^{2} + \alpha ||\mathbf{x}||_1$, with $\alpha$ defined as for ridge regression.
 \subsection{Validation - K means clustering}
-The K-means clustering method is used to cluster data into K classes. The method initializes k random centroids for each cluster. In each iteration, each data point is assigned to the cluster based on the minimal Euclidean distance to each centroid, until convergence is reached. At each iteration, the centroids are updated as the mean of the assigned data points. The algorithm stops when convergence is met, at which point the final output is the k cluster centroids and the assignment of each data point to a cluster.
+The K-means clustering method is used to cluster data into K classes. The method initializes k random centroids for each cluster. In each iteration, each data point is assigned to the cluster based on the minimal Euclidean distance to each centroid, until convergence is reached. At each iteration, the centroids are updated as the mean of the assigned data points. The algorithm stops when convergence is met, at which point the final output is the k cluster centroids and the assignment of each data point to a cluster. Since each shot embedded in the log can be interpreted as a cluster this method can use to predict where the shots are located. An illustration of the iterations is shown in figure \ref{Kmeans}. 
 \begin{figure}[H]
     \centering
     \includegraphics[width=10cm]{images/Kmeans.png}
@@ -266,6 +262,8 @@ The K-means clustering method is used to cluster data into K classes. The method
 What follows are the optimal CT-model parameters, for the task of detecting shots in logs, and the experiments used to identify them. 
 
 \subsection{Number of rays, angles and resolution} 
+After experimenting with different resolutions, number of rays and angles we found that the condition number of the matrix\footnote{Defined as in Section \ref{sec:CT-discretization}.} had a huge impact\footnote{See \url{https://blogs.mathworks.com/cleve/2017/07/17/what-is-the-condition-number-of-a-matrix/}.} especially since reality often involves some kind of noise. 
+We also found that a resolution lower than 34 px $\times$ 34 px resulted in the reconstructed image being very pixelated. 
 
 Something wise\footnote{See \url{https://drive.google.com/drive/folders/1LJ_m7pny6Ikl0HH2YcMOjl5B7i967D1S?usp=sharing}}
 
@@ -274,29 +272,12 @@ Based on the data described in section \ref{NISTDATA} we created the following p
 \begin{figure}[H]
     \centering
     \large{Attenuation coefficients} \\
-    \begin{subfigure}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[scale=0.4]{images/attenuation_coef_zoom.png}
-        \caption{\small Note that the x-axis is log scaled. Each mark on the graph is a data point from NIST. \newline}
-        \label{fig:attenuation-coef-zoom}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[scale=0.4]{images/diff-attenuation-coef-bismuth-iron-zoom.png}
-        \caption{\small Absolute difference between the attenuation coefficients for bismuth and iron. Data is calculated using linear interpolation - see appendix \ref{appendix:attenuation-coefficients}.}
-        \label{fig:diff-attenuation-coef-bismuth-iron}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.32\textwidth}
-        \centering
-        \includegraphics[scale=0.4]{images/diff-attenuation-coef-wood-iron-zoom.png}
-        \caption{\small Absolute difference between the attenuation coefficients for wood and iron. Data is calculated using linear interpolation - see appendix \ref{appendix:attenuation-coefficients}.}
-        \label{fig:diff-attenuation-coef-wood-iron}
-    \end{subfigure}
-    \caption{\small Note that in both of these images that they are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
+    \includegraphics[scale=0.3]{images/combined-plot-attenuation.png}
+    \caption{\small Note that these images are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
     \label{fig:both-attenuation-coeff-plots}
 \end{figure}
 
-Based on Figure \ref{fig:attenuation-coef-zoom} and Figure \ref{fig:diff-attenuation-coef-bismuth-iron} we see that the best value for noticing a difference between wood, bismuth and iron is at 16.4 keV. 
+Based on Figure \ref{fig:both-attenuation-coeff-plots} we see that the best configuration for the X-Ray for noticing a difference between wood, bismuth and iron is at 16.4 keV. We also note that the best configuration for noticing a difference between wood and iron is at 10 keV.  
 
 Using Lambert Beer's law we also created the following plot which shows the ratio between input and output energy intensities depending on different energy levels (Figure \ref{fig:energy-vs-output-percentage}.). 
 
@@ -349,7 +330,7 @@ then, and assuming $I \neq 0$, we get
     \frac{I'(\ell)}{I(\ell)} = -x.
 \end{equation}
 
-Integrating both sides of this expressions yields
+Integrating both sides of this expression yields
 
 \begin{equation}
     \int_{0}^{\ell_{\max}} \frac{I'(\ell)}{I(\ell)} \; \mathrm{d}\ell = \int_{0}^{\ell_{\max}} -x \; \mathrm{d}\ell,
@@ -373,18 +354,18 @@ Or equivalently:
     \int_{0}^{\ell_{\max}}x \text{d} \ell = \log\left(\frac{I_0}{I}\right).
 \end{equation}
 
-As a special case when the material is homogeneous we get that $x = x_0$ is independent of $\ell$ and therefore
+As a special case when the material is homogeneous, we get that $x = x_0$ is independent of $\ell$ and therefore
 
 \begin{equation}
     I = I_0 \exp{(-x_0 \ell_{\max})}.
 \end{equation}
 
-% \subsection{Simplification of the model}\label{appendix:simplification-discreatization}
-% Approximating the integral using the Riemann definition we get, using the given partition of $x_1, x_2, \dots, x_p$
+\subsection{Least squares}\label{appendix:least-squares}
+Starting from the observation that solving $A\mathbf{x} = \mathbf{b}$ is equivalent to minimizing $||A\mathbf{x} - \mathbf{b}||_2^{2}$, we see that the necessary property for an optimum $\nabla f(\mathbf{x}) = \mathbf{0}$ 
 
-% \begin{equation}
-%     \int_{0}^{\ell_{\max}} x \; \mathrm{d}\ell \approx \sum_{j=1}^{p} x_j \ell_j.
-% \end{equation}
+\subsection{Ridge regression}\label{appendix:ridge-time}
+???
+
 
 \section{Code}
 All code can also be found on GitHub \url{https://github.com/ElMiho/02526-exam-project}. 
