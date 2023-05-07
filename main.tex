@@ -255,7 +255,7 @@ The K-means clustering method is used to cluster data into K classes. The method
 \begin{figure}[H]
     \centering
     \includegraphics[width=10cm]{images/Kmeans.png}
-    \caption[Iterations in K-means clustering]{https://en.wikipedia.org/wiki/K-means_clustering \footnotemark }
+    \caption[Iterations in K-means clustering]{Iterations in K-means clustering.\footnote{Source: https://en.wikipedia.org/wiki/K-means-clustering}}
     \label{Kmeans}
 \end{figure}
 
@@ -274,17 +274,23 @@ Based on the data described in section \ref{NISTDATA} we created the following p
 \begin{figure}[H]
     \centering
     \large{Attenuation coefficients} \\
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[scale=0.4]{images/attenuation_coef_zoom.png}
         \caption{\small Note that the x-axis is log scaled. Each mark on the graph is a data point from NIST. \newline}
         \label{fig:attenuation-coef-zoom}
     \end{subfigure}
-    \begin{subfigure}[b]{0.49\textwidth}
+    \begin{subfigure}[b]{0.32\textwidth}
         \centering
         \includegraphics[scale=0.4]{images/diff-attenuation-coef-bismuth-iron-zoom.png}
         \caption{\small Absolute difference between the attenuation coefficients for bismuth and iron. Data is calculated using linear interpolation - see appendix \ref{appendix:attenuation-coefficients}.}
         \label{fig:diff-attenuation-coef-bismuth-iron}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}
+        \centering
+        \includegraphics[scale=0.4]{images/diff-attenuation-coef-wood-iron-zoom.png}
+        \caption{\small Absolute difference between the attenuation coefficients for wood and iron. Data is calculated using linear interpolation - see appendix \ref{appendix:attenuation-coefficients}.}
+        \label{fig:diff-attenuation-coef-wood-iron}
     \end{subfigure}
     \caption{\small Note that in both of these images that they are only plotted in the log interval for commercial X-Ray (10 keV - 200 keV).}
     \label{fig:both-attenuation-coeff-plots}
