@@ -7,7 +7,7 @@ import validation
 def add_noise_float(b, mean_noise, std_noise):
     return b + np.random.normal(loc=mean_noise, scale=std_noise, size=b.shape)
 
-test_logo = np.loadtxt("./test_logo copy.txt", dtype=float)
+test_logo = np.loadtxt("./test_logo copy 2.txt", dtype=float)
 
 N = test_logo.shape[0]
 x = test_logo.flatten(order="F")
@@ -27,17 +27,20 @@ im_recov_ridge = np.reshape(model_ridge.coef_, (N,N), order = "F")
 
 kmeans_image, _ = validation.kmean_clust(im_recov_ridge)
 
+plt.figure(1)
 plt.imshow(test_logo, cmap="gray")
 plt.axis("off")
-plt.show()
+plt.savefig("test_logo.png")
 
+plt.figure(2)
 plt.imshow(im_recov_ridge, cmap="gray")
 plt.axis("off")
-plt.show()
+plt.savefig("test_logo_recov.png")
 
+plt.figure(3)
 plt.imshow(kmeans_image, cmap="gray")
 plt.axis("off")
-plt.show()
+plt.savefig("test_logo_kmeans.png")
 
 
 
