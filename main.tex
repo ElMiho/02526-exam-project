@@ -58,8 +58,9 @@
 \date{7/5-2023}
 
 \begin{document}
-\maketitle
-
+\maketitle\thispagestyle{empty}
+\clearpage
+\pagenumbering{arabic} 
 \newpage
 
 % ASSUMPTIONS
@@ -162,7 +163,14 @@ How representative these distributions are of the actual object depends on the n
 Therefore, as part of constructing a fast and costefficient CT-scanner design, we simulate distributions using different numbers of rays and angles, and at different resolutions for use in determinening the best combination of these parameters. Moreover, we want our parameters to be robust towards noise and to different possible wood-shapes and shot-distributions and thus also simulate distributions varying these parameters.
 
 \subsection{Data - attenuation coefficients} \label{NISTDATA}
-From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{The attenuation coefficients for wood were calculated based on its percentagewise composition of carbon, hydrogen and oxygen - based on the source: ???.}. Based on the 
+From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{The attenuation coefficients for wood were calculated based on its percentagewise composition of carbon, hydrogen and oxygen - based on the source: ???.}. Based on the data we created the following plot (Figure \ref{fig:all-NIST-attenuation-coef-data}.). 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{images/all_NIST_attenuation_coef_data.png}
+    \caption{Wise stuff}
+    \label{fig:all-NIST-attenuation-coef-data}
+\end{figure}
 
 
 \section{Mathematical model}
@@ -361,9 +369,19 @@ As a special case when the material is homogeneous, we get that $x = x_0$ is ind
 \end{equation}
 
 \subsection{Least squares}\label{appendix:least-squares}
-Starting from the observation that solving $A\mathbf{x} = \mathbf{b}$ is equivalent to minimizing $||A\mathbf{x} - \mathbf{b}||_2^{2}$, we see that the necessary property for an optimum $\nabla f(\mathbf{x}) = \mathbf{0}$ 
+Starting from the observation that solving $A\mathbf{x} = \mathbf{b}$ is equivalent to minimizing $||A\mathbf{x} - \mathbf{b}||_2^{2}$, we see that the necessary property for an optimum $\nabla f(\mathbf{x}) = \mathbf{0}$ is only applicable when $\mathbf{x}$ has:
+\begin{align}
+    0 &= \nabla ||A\mathbf{x} - \mathbf{b}||_2^{2} = \nabla (A\mathbf{x} - \mathbf{b})^\intercal (A\mathbf{x} - \mathbf{b}) = \nabla \left(\mathbf{x}^\intercal A^\intercal A \mathbf{x} - 2\mathbf{x}^\intercal A^\intercal \mathbf{b} + \mathbf{b}^\intercal \mathbf{b} \right) =  \\
+    &= 2A^\intercal A \mathbf{x} - 2A\mathbf{b} \iff A^\intercal A \mathbf{x} = A^\intercal\mathbf{b}
+\end{align}
+And using the SVD of $A$ we see that full row rank then implies $\mathbf{x} = (A^\intercal A)^{-1} A^\intercal\mathbf{b}$. That this is in fact a minimum (when $A$ has full row rank), then follows directly from the positive definiteness of $A^\intercal A$.
 
 \subsection{Ridge regression}\label{appendix:ridge-time}
+By the same logic used in appendix \ref{appendix:least-squares}, but using the objective function $||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha \mathbf{b}$ we have:
+\begin{align}
+    0 &= \nabla (||A\mathbf{x} - \mathbf{b}||_2^{2} + \alpha ||\mathbf{x}||_2^{2}) \stackrel{\textrm{Appendix \ref{appendix:least-squares}}}{=} 2A^\intercal A \mathbf{x} - 2A\mathbf{b} + 2\alpha \mathbf{x} \\
+    &\iff 
+\end{align}
 ???
 
 
