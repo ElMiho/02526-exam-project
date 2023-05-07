@@ -17,7 +17,8 @@
 \pgfplotsset{compat=1.16}
 \usepackage{caption}
 \usepackage[top=2cm, bottom=2cm]{geometry}
-
+\usepackage{graphicx}
+\usepackage{subcaption}
 
 \newcommand\scalemath[2]{\scalebox{#1}{\mbox{\ensuremath{\displaystyle #2}}}}
 
@@ -45,6 +46,7 @@
     showtabs=false,                  
     tabsize=2
 }
+\usetikzlibrary{positioning, calc, tikzmark, external}
 
 \lstset{style=mystyle}
 
@@ -59,6 +61,40 @@
 
 \begin{document}
 \maketitle\thispagestyle{empty}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.3\linewidth}
+\centering
+\includegraphics[width=\linewidth]{code/test_logo.png}
+\end{subfigure}
+\begin{subfigure}[t]{0.4\linewidth}
+\centering
+\includegraphics[width=\linewidth]{code/test_logo_recov.png}
+\end{subfigure}
+\begin{subfigure}[t]{0.5\linewidth}
+\centering
+\includegraphics[width=\linewidth]{code/test_logo_kmeans.png}
+\end{subfigure}
+
+
+\clearpage
+\pagenumbering{arabic} 
+\vspace{10pt}
+
+\begin{tikzpicture}[overlay, remember picture, <->,>=stealth, shorten <=2pt, shorten >=2pt]
+% Arrow 1
+\draw[->, very thick] (-1.5,8) to (0.5,8.6);
+\node[above, rotate=17, font=\footnotesize] at (-0.77,8.15) {No Noise};
+\node[above, rotate=17, font=\footnotesize] at (-0.5,7.9) {Reconstruct};
+
+% Arrow 2
+\draw[->, very thick] (2.5,6.75) to (0,5.9);
+\node[above, rotate=18.77, font=\footnotesize] at (1.1,6.25) {Add Noise};
+\node[above, rotate=18.77, font=\footnotesize] at (1.35,5.95) {Reconstruct};
+\end{tikzpicture}
+\label{fig:front_page}
+\end{figure}
 \clearpage
 \pagenumbering{arabic} 
 \newpage
@@ -163,15 +199,14 @@ How representative these distributions are of the actual object depends on the n
 Therefore, as part of constructing a fast and costefficient CT-scanner design, we simulate distributions using different numbers of rays and angles, and at different resolutions for use in determinening the best combination of these parameters. Moreover, we want our parameters to be robust towards noise and to different possible wood-shapes and shot-distributions and thus also simulate distributions varying these parameters.
 
 \subsection{Data - attenuation coefficients} \label{NISTDATA}
-From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{The attenuation coefficients for wood were calculated based on its percentagewise composition of carbon, hydrogen and oxygen - based on the source: ???.}. Based on the data we created the following plot (Figure \ref{fig:all-NIST-attenuation-coef-data}.). 
-
+From NIST\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.} we collected the attenuation coefficients for iron/steel, lead, bismuth and wood\footnote{The attenuation coefficients for wood were calculated based on its percentagewise composition of carbon, hydrogen and oxygen - based on the source: ???.}. Based on this data we created the following plot (Figure \ref{fig:all-NIST-attenuation-coef-data}.) to illustrate how the ability to differentiate one compound from another depends on the energy used.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{images/all_NIST_attenuation_coef_data.png}
-    \caption{Wise stuff}
+    \caption{The blue box shows the typical energy range for commercial X-Ray sources.}
     \label{fig:all-NIST-attenuation-coef-data}
-\end{figure}
-
+\end{figure} 
+\noindent Moreover, the attenuation coefficients are also a deciding factor in how intense the beam we receive after going through a log is\footnote{See \url{https://www.nist.gov/pml/x-ray-mass-attenuation-coefficients}.}, which is usefull, as receiving a higher percentage of the input energy would imply more robustness towards noise.
 
 \section{Mathematical model}
 \subsection{CT - attenuation distributions - discretization}\label{sec:CT-discretization}
@@ -243,18 +278,19 @@ We can, by applying equation \ref{eq:for-one-ray}, construct the following linea
     A \boldsymbol{x} = \boldsymbol{b} \label{eq:main}
 \end{equation} \\
 Where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. \\
-In most cases, $A$ is non-square and therefore many solution methods exists, the choice of solver has a large influence on the quality and speed of the solution\footnote{??? Reference to such solution methods and the fact that ???}. Therefore, in addition to finding the best physical parameters for our CT-scanner (number of angles, rays, resolution, photonic energy), we also explore the following different mathematical models for optimizing robustness towards noise and solver speed.
+In most cases, $A$ is non-square and therefore many solution methods exists, the choice of solver has a large influence on the quality and speed of the solution\footnote{See section ???}. Therefore, in addition to finding the best physical parameters for our CT-scanner (number of angles, rays, resolution, photonic energy), we also explore the following different mathematical models for optimizing robustness towards noise and solver speed.
 
 \paragraph{Least squares:} Least squares method is a method for solving systems of the form $A\mathbf{x} = \mathbf{b}$ by minimizing $||A\mathbf{x} - \mathbf{b}||_{2}^{2}$. This minimization problem naturally leads to the following solution for $x$:
 \begin{equation}
     \mathbf{x} = (A^\intercal A)^{-1} A^\intercal \mathbf{b}
 \end{equation}
-Which is well defined when $A$ has full row rank\footnote{See appendix ??? for derivations}. In practice, noise is introduced in the attenuation distributions through various sources\footnote{Some sources ???}, which can interfere with the predicted attenuation coefficients when using least squares as a solution method, thus the need for ways to reduce the noise in the reconstruction.
+Which is well defined when $A$ has full row rank\footnote{See Appendix \ref{appendix:least-squares} for derivations}. In practice, noise is introduced in the attenuation distributions through various sources\footnote{Some sources ???}, which can interfere with the predicted attenuation coefficients when using least squares as a solution method, thus the need for ways to reduce the noise in the reconstruction.
 
-\paragraph{Ridge regression} Ridge regression is one way of dealing with noise by adding a correction term $\alpha ||\mathbf{x}||_2^2$ to the minimization problem defined in least squares, that is $\min_x ||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha ||\mathbf{x}||_2^2$ for some $\alpha > 0$. This second term penalizes large values in the $\mathbf{x}$ vector and thus smoothens the resulting reconstruction, thereby reducing the noise. This formulation also has the advantage, that it always results in a well posed problem\footnote{See appendix ??? for derivations}.
+\paragraph{Ridge regression} Ridge regression is one way of dealing with noise by adding a correction term $\alpha ||\mathbf{x}||_2^2$ to the minimization problem defined in least squares, that is $\min_x ||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha ||\mathbf{x}||_2^2$ for some $\alpha > 0$. This second term penalizes large values in the $\mathbf{x}$ vector and thus smoothens the resulting reconstruction, thereby reducing the noise. This formulation also has the advantage, that it always results in a well posed problem\footnote{See Appendix \ref{appendix:ridge-time} for derivations}.
 
 %\paragraph{Lasso regression} Ridge regression will, penalize large outliers disproportionately more than non-outliers and can thus lead to a disproportionate smoothening of the image. A less aggressive alternative is thus to reduce the penalty by using the $L_1$ norm in stead, leading to the minimization problem $\min_x ||A\mathbf{x} - \mathbf{b}||_{2}^{2} + \alpha ||\mathbf{x}||_1$, with $\alpha$ defined as for ridge regression.
 \subsection{Validation - K means clustering}
+As described in the section above, our model assummes that the attenuation of any given grid cell can be perfectly described as the mean attenuation over the grid cell. This would cause the values of shots in logs to be diluted\footnote{With some dependence on the reduction block size parameter} and we thus need a method to quantitatively describe wether we can still differentiate shots in logs and the surrounding wood, for this we use K-means clustering. \\
 The K-means clustering method is used to cluster data into K classes. The method initializes k random centroids for each cluster. In each iteration, each data point is assigned to the cluster based on the minimal Euclidean distance to each centroid, until convergence is reached. At each iteration, the centroids are updated as the mean of the assigned data points. The algorithm stops when convergence is met, at which point the final output is the k cluster centroids and the assignment of each data point to a cluster. Since each shot embedded in the log can be interpreted as a cluster this method can use to predict where the shots are located. An illustration of the iterations is shown in figure \ref{Kmeans}. 
 \begin{figure}[H]
     \centering
@@ -264,14 +300,12 @@ The K-means clustering method is used to cluster data into K classes. The method
 \end{figure}
 
 
-
-
 \section{Experiments and results}
 What follows are the optimal CT-model parameters, for the task of detecting shots in logs, and the experiments used to identify them. 
 
-\subsection{Number of rays, angles and resolution} 
+\subsection{Number of rays, angles and resolution}\label{sec:num-rays-angles-resolution} 
 After experimenting with different resolutions, number of rays and angles we found that the condition number of the matrix\footnote{Defined as in Section \ref{sec:CT-discretization}.} had a huge impact\footnote{See \url{https://blogs.mathworks.com/cleve/2017/07/17/what-is-the-condition-number-of-a-matrix/}.} especially since reality often involves some kind of noise. 
-We also found that a resolution lower than 34 px $\times$ 34 px resulted in the reconstructed image being very pixelated. 
+We also found that a resolution lower than 34 px $\times$ 34 px resulted in the reconstructed image being very pixelated\footnote{Some reference ???}. 
 
 Something wise\footnote{See \url{https://drive.google.com/drive/folders/1LJ_m7pny6Ikl0HH2YcMOjl5B7i967D1S?usp=sharing}}
 
@@ -297,14 +331,18 @@ Using Lambert Beer's law we also created the following plot which shows the rati
 \end{figure}
 
 \section{Discussion}
-To reconstruct an image from the attenuation distributions by a CT-scanner well enough to spot some detail, in this case shots in logs, there are a lot of parameters that can be tuned and approximations to be made. The specific approximations and simplifications to make is a model specific task and all come with tradeoffs.
-???
+To reconstruct an image from the attenuation distributions by a CT-scanner well enough to spot some detail, in this case shots in logs, there are a lot of parameters that can be tuned and approximations to be made. The specific approximations and simplifications to make is a model specific task and all come with tradeoffs. 
 
 % Bedre formuleringer for dette afsnit eksisterer helt klart
-In Section \ref{sec:energy-usage} we saw that configuring the X-Ray to use 16.4 keV was the optimal energy level for differentiating between iron and bismuth using data from NIST. This however assumed that wood is completely homogeneous and therefore, before using the system in the "real" world, a better value could be found by trying different energy levels in a concrete example and then deciding on a value. 
+In Section \ref{sec:energy-usage} we saw that configuring the X-Ray to use 16.4 keV was the optimal energy level for differentiating between iron and bismuth using data from NIST. This however assumed that wood is completely homogeneous and therefore, before using the system in the "real" world, a better value could be found by trying different energy levels in a concrete example and then deciding on a value.
 
 \section{Conclude}
 ???
+
+
+\section{References}
+???
+
 
 \section{The list ??? SKAL SLETTES}
 \begin{itemize}
@@ -380,9 +418,9 @@ And using the SVD of $A$ we see that full row rank then implies $\mathbf{x} = (A
 By the same logic used in appendix \ref{appendix:least-squares}, but using the objective function $||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha \mathbf{b}$ we have:
 \begin{align}
     0 &= \nabla (||A\mathbf{x} - \mathbf{b}||_2^{2} + \alpha ||\mathbf{x}||_2^{2}) \stackrel{\textrm{Appendix \ref{appendix:least-squares}}}{=} 2A^\intercal A \mathbf{x} - 2A\mathbf{b} + 2\alpha \mathbf{x} \\
-    &\iff 
+    &\iff \mathbf{x} = (A^\intercal A + \alpha I)^{-1} \mathbf{b}
 \end{align}
-???
+Note that the inverse $A^\intercal A + \alpha I$ always exists by the positive definiteness of $A^\intercal A + \alpha I$.
 
 
 \section{Code}
