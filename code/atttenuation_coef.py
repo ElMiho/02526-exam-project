@@ -168,8 +168,11 @@ plt.figure(3)
 plt.plot(np.log(x_val_bismuth), y_val_bismuth)
 plt.plot(np.log(x_val_iron), y_val_iron)
 plt.plot(np.log(x_val_wood), y_val_wood)
+plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
+
 plt.xlabel("Log X-Ray [keV]")
 plt.ylabel(r"Attenuation coef [$cm^{-1}$]")
 plt.legend(["Bismuth", "Iron", "Wood"])
+
 plt.savefig(".././images/all_NIST_attenuation_coef_data.png")
 plt.close()
