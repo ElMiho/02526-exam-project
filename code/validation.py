@@ -25,7 +25,10 @@ def return_circle(im):
     n,m = im.shape
     return_im = np.zeros((n,m))
     c = n//2
-    radius = c - 5
+    if (n==20):
+        radius = c-1.25
+    else:
+        radius = c - 1
     for i in range(n):
         for j in range(m):
             if ((i - c)**2 + (j - c)**2) < radius**2:   #Area to evaluate
