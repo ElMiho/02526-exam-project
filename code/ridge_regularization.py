@@ -6,46 +6,49 @@ from paralleltomo import paralleltomo
 import sklearn.linear_model as sklin
 from generate_test_functions import *
 
-def generate_confusion(predictions,original_im,predicted_im,att_coef):
+def generate_confusion(predicts,original_im,im_pred,att_coef_pellet,att_coef_wood):
     
-    true_positive = 0
-    false_positive = 0
-    false_negative = 0
-    true_negative = 0
+    true_pos = 0
+    false_pos = 0
+    false_neg = 0
+    true_neg = 0
     
-    for i,j in predictions:
-        if(predicted_im[i,j]==att_coef):   #Predicted pellet
-            if(original_im[i,j]==predicted_im[i,j]):    #Pellet prediction true
-                true_positive += 1
+    for i,j in predicts:
+        if(im_pred[i,j]==att_coef_pellet):   #Predicted pellet
+            if(original_im[i,j]==im_pred[i,j]):    #Pellet prediction true
+                true_pos += 1
             else: # Pellet prediction false
-                false_positive += 1
-        elif(original_im[i,j]==att_coef):   #Predicted wood
-            if(original_im[i,j]==predicted_im[i,j]): #Wood prediction true
-                true_negative += 1
+                false_pos += 1
+        elif(original_im[i,j]==att_coef_wood):   #Predicted wood
+            if(original_im[i,j]==im_pred[i,j]): #Wood prediction true
+                true_neg += 1
             else:   #Wood prediction false
-                false_negative += 1
-    confusion_matrix = np.array([[true_negative, false_positive], [false_negative, true_positive]])
+                false_neg += 1
+    confusion_matrix = np.array([[true_pos, false_pos], [false_neg, true_neg]])
     return confusion_matrix
 
-def predictions(recovered_image, attenuations):
+def predictions(recov_im, att):
     # Attenuations, wood, bismuth, steel
-    n,m = recovered_image.shape
+    n,m = recov_im.shape
     c = n//2
-    predicted_bismuth = []
-    predicted_steel = []
-    predicted_image = np.zeros((n,m))
+    pred_bismuth = []
+    pred_steel = []
+    pred_wood = []
+    pred_image = np.zeros((n,m))
     for i in range(n):
         for j in range(m):
             if ((i - c)**2 + (j - c)**2) <= c**2:
-                x = recovered_image[i,j]
-                y = np.abs([x-attenuations[0],x-attenuations[1],x-attenuations[2]])
+                x = recov_im[i,j]
+                y = np.abs([x-att[0],x-att[1],x-att[2]])
                 idx = np.argmin(y)
-                predicted_image[i,j] = attenuations[idx]
+                pred_image[i,j] = att[idx]
                 if(idx==1):
-                    predicted_bismuth.append((i,j))
+                    pred_bismuth.append((i,j))
                 elif(idx==2):
-                    predicted_steel.append((i,j))
-    return predicted_image,predicted_bismuth,predicted_steel
+                    pred_steel.append((i,j))
+                else:
+                    pred_wood.append((i,j))
+    return pred_image,pred_bismuth,pred_steel,pred_wood
 
 def likelihood(recovered_image, attenuations):
     n,m = recovered_image.shape
@@ -65,12 +68,14 @@ def add_noise_float(b, mean_noise, std_noise):
 
 testImage = np.load("./testimage.npy")
 
-max_pixel = np.max(testImage)
-testImage = testImage / max_pixel
+#max_pixel = np.max(testImage)
+#testImage = testImage / max_pixel
 
 unique_values = np.unique(testImage)
 # Wood, Bismuth, Iron
-att_coefs = unique_values[1:]
+att_wood = unique_values[1]
+att_bismuth = unique_values[2]
+att_iron = unique_values[3]
 
 downSamplingFactor = 100
 
@@ -82,14 +87,15 @@ A,_,_,_ = paralleltomo(N)
 
 b = A @ x_input
 
-im, _, _, _ = np.linalg.lstsq(A, b)
+im_recov, _, _, _ = np.linalg.lstsq(A, b)
 
-im = np.reshape(im, (N, N), order="F")
+im_recov = np.reshape(im_recov, (N, N), order="F")
 
-predicted_im,predicted_bismuth,predicted_steel = predictions(resizedImage,att_coefs)
 
-confusion_steel = generate_confusion(predicted_steel,im,predicted_im,att_coefs[2])
-confusion_bismuth = generate_confusion(predicted_bismuth,im,predicted_im,att_coefs[1])
+predicted_im,predicted_bismuth,predicted_steel = predictions(im_recov,unique_values[1:])
+
+confusion_steel = generate_confusion(predicted_steel,im_recov,predicted_im,att_steel,att_wood)
+confusion_bismuth = generate_confusion(predicted_bismuth,im_recov,predicted_im,att_bismuth,att_wood)
 
 print(f"confusion matrix steel:\n {confusion_steel}")
 print(f"confusion matrix bismuth:\n {confusion_bismuth}")
