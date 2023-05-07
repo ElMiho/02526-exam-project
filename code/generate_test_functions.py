@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import scipy.spatial.distance as spd
+import matplotlib.pyplot as plt
 
 def overlap(locations, next_loc, n):
     #Check whether pellets are disjoint
@@ -79,5 +80,10 @@ def generate_im(n,att_coefs,num_pellets,pellet_size):
             im = add_pellet(im,loc, pellet_size, att_coefs[2])
     return im
 
-
+n=40
+#Wood, iron, bismuth
+att_coefs = [1.07,380.2,1443.5]
+im = generate_im(n,num_pellets=10,pellet_size=1)
+plt.imshow(im)
+plt.show()
 

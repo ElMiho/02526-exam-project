@@ -176,3 +176,26 @@ plt.legend(["Bismuth", "Iron", "Wood"])
 
 plt.savefig(".././images/all_NIST_attenuation_coef_data.png")
 plt.close()
+
+# Calculation of attenuation coeff for 16.4 keV and 10 keV
+print("16.4 keV")
+print(
+    f"\tbismuth attenuation coef: {np.interp(16.4, x_val_bismuth, y_val_bismuth)}"
+)
+print(
+    f"\tiron attenuation coef: {np.interp(16.4, x_val_iron, y_val_iron)}"
+)
+print(
+    f"\twood attenuation coef: {np.interp(16.4, x_val_wood, y_val_wood)}"
+)
+
+print("10 keV")
+print(
+    f"\tbismuth attenuation coef: {np.interp(10, x_val_bismuth, y_val_bismuth)}"
+)
+print(
+    f"\tiron attenuation coef: {np.interp(10, x_val_iron, y_val_iron)}"
+)
+print(
+    f"\twood attenuation coef: {np.interp(10, x_val_wood, y_val_wood)}"
+)
