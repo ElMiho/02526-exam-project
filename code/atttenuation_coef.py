@@ -164,10 +164,20 @@ plt.legend(["Absolute difference between wood and iron"], fontsize="14", loc="up
 plt.savefig(".././images/combined-plot-attenuation.png")
 plt.close()
 
-plt.figure(3)
-plt.plot(np.log(x_val_bismuth), y_val_bismuth)
-plt.plot(np.log(x_val_iron), y_val_iron)
-plt.plot(np.log(x_val_wood), y_val_wood)
+plt.figure(3, figsize=(25, 5))
+
+idx = 0
+for i,(x1,x2,x3) in enumerate(zip(np.log(x_val_bismuth), np.log(x_val_iron), np.log(x_val_wood))):
+    if x1 >= 6.5 or x2 >= 6.5 or x3 >= 6.5:
+        idx = i
+        break
+
+print(
+    np.log(x_val_bismuth)
+)
+plt.plot(np.log(x_val_bismuth[:idx]), y_val_bismuth[:idx])
+plt.plot(np.log(x_val_iron[:idx]), y_val_iron[:idx])
+plt.plot(np.log(x_val_wood[:idx]), y_val_wood[:idx])
 plt.fill_betweenx([min(y_val_iron),max(y_val_iron)],np.log(10),np.log(200),alpha=0.5)
 
 plt.xlabel("Log X-Ray [keV]")
