@@ -77,9 +77,6 @@
 \includegraphics[width=\linewidth]{code/test_logo_kmeans.png}
 \end{subfigure}
 
-
-\clearpage
-\pagenumbering{arabic} 
 \vspace{10pt}
 
 \begin{tikzpicture}[overlay, remember picture, <->,>=stealth, shorten <=2pt, shorten >=2pt]
@@ -95,6 +92,7 @@
 \end{tikzpicture}
 \label{fig:front_page}
 \end{figure}
+
 \clearpage
 \pagenumbering{arabic} 
 \newpage
@@ -280,13 +278,15 @@ We can, by applying equation \ref{eq:for-one-ray}, construct the following linea
 Where $A = (a_{i,j})_{1 \leq i \leq m, 1 \leq j \leq N^2}$, $\boldsymbol{x}$ is a vector of attenuation coefficients, consisting of $x_j, j = 1, \dots, N^2$ and $\boldsymbol{b}$ is a vector consisting of $b_j, j = 1, \dots, m$. \\
 In most cases, $A$ is non-square and therefore many solution methods exists, the choice of solver has a large influence on the quality and speed of the solution\footnote{See section ???}. Therefore, in addition to finding the best physical parameters for our CT-scanner (number of angles, rays, resolution, photonic energy), we also explore the following different mathematical models for optimizing robustness towards noise and solver speed.
 
-\paragraph{Least squares:} Least squares method is a method for solving systems of the form $A\mathbf{x} = \mathbf{b}$ by minimizing $||A\mathbf{x} - \mathbf{b}||_{2}^{2}$. This minimization problem naturally leads to the following solution for $x$:
+\subsubsection{Least squares}\label{sec:least-squares-text} 
+Least squares method is a method for solving systems of the form $A\mathbf{x} = \mathbf{b}$ by minimizing $||A\mathbf{x} - \mathbf{b}||_{2}^{2}$. This minimization problem naturally leads to the following solution for $x$:
 \begin{equation}
     \mathbf{x} = (A^\intercal A)^{-1} A^\intercal \mathbf{b}
 \end{equation}
 Which is well defined when $A$ has full row rank\footnote{See Appendix \ref{appendix:least-squares} for derivations}. In practice, noise is introduced in the attenuation distributions through various sources\footnote{Some sources ???}, which can interfere with the predicted attenuation coefficients when using least squares as a solution method, thus the need for ways to reduce the noise in the reconstruction.
 
-\paragraph{Ridge regression} Ridge regression is one way of dealing with noise by adding a correction term $\alpha ||\mathbf{x}||_2^2$ to the minimization problem defined in least squares, that is $\min_x ||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha ||\mathbf{x}||_2^2$ for some $\alpha > 0$. This second term penalizes large values in the $\mathbf{x}$ vector and thus smoothens the resulting reconstruction, thereby reducing the noise. This formulation also has the advantage, that it always results in a well posed problem\footnote{See Appendix \ref{appendix:ridge-time} for derivations}.
+\subsubsection{Ridge regression}\label{sec:ridgre-regression-text}
+Ridge regression is one way of dealing with noise by adding a correction term $\alpha ||\mathbf{x}||_2^2$ to the minimization problem defined in least squares, that is $\min_x ||A\mathbf{x} - \mathbf{b}||_2^2 + \alpha ||\mathbf{x}||_2^2$ for some $\alpha > 0$. This second term penalizes large values in the $\mathbf{x}$ vector and thus smoothens the resulting reconstruction, thereby reducing the noise. This formulation also has the advantage, that it always results in a well posed problem\footnote{See Appendix \ref{appendix:ridge-time} for derivations}.
 
 %\paragraph{Lasso regression} Ridge regression will, penalize large outliers disproportionately more than non-outliers and can thus lead to a disproportionate smoothening of the image. A less aggressive alternative is thus to reduce the penalty by using the $L_1$ norm in stead, leading to the minimization problem $\min_x ||A\mathbf{x} - \mathbf{b}||_{2}^{2} + \alpha ||\mathbf{x}||_1$, with $\alpha$ defined as for ridge regression.
 \subsection{Validation - K means clustering}
@@ -295,19 +295,37 @@ The K-means clustering method is used to cluster data into K classes. The method
 \begin{figure}[H]
     \centering
     \includegraphics[width=10cm]{images/Kmeans.png}
-    \caption[Iterations in K-means clustering]{Iterations in K-means clustering.\footnote{Source: https://en.wikipedia.org/wiki/K-means-clustering}}
+    \caption[Iterations in K-means clustering]{\small Iterations in K-means clustering.\footnote{Source: https://en.wikipedia.org/wiki/K-means-clustering}}
     \label{Kmeans}
 \end{figure}
 
 
 \section{Experiments and results}
-What follows are the optimal CT-model parameters, for the task of detecting shots in logs, and the experiments used to identify them. 
+What follows are the optimal CT-model parameters, for the task of detecting shots in logs. 
 
 \subsection{Number of rays, angles and resolution}\label{sec:num-rays-angles-resolution} 
 After experimenting with different resolutions, number of rays and angles we found that the condition number of the matrix\footnote{Defined as in Section \ref{sec:CT-discretization}.} had a huge impact\footnote{See \url{https://blogs.mathworks.com/cleve/2017/07/17/what-is-the-condition-number-of-a-matrix/}.} especially since reality often involves some kind of noise. 
-We also found that a resolution lower than 34 px $\times$ 34 px resulted in the reconstructed image being very pixelated\footnote{Some reference ???}. 
+We also found that a resolution lower than 17 px $\times$ 17 px resulted in the reconstructed image being very impacted by our setup, but still able to not only detect both the iron bullet and the bismuth but also differentiate between them as seen in Figure \ref{fig:two-different-images-for-4.1}. 
 
-Something wise\footnote{See \url{https://drive.google.com/drive/folders/1LJ_m7pny6Ikl0HH2YcMOjl5B7i967D1S?usp=sharing}}
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.45\linewidth}
+    \includegraphics[width=\linewidth]{images/total-picture-17-condA1-3.1025624256157716e+16-condA2-7.2959506476769125.png}
+    \caption{Shape: 17 $\times$ 17}
+    \label{fig:sub1}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.45\linewidth}
+    \includegraphics[width=\linewidth]{images/total-picture-25-condA1-inf-condA2-49.46075340640841.png}
+    \caption{Shape: 25 $\times$ 25}
+    \label{fig:sub2}
+  \end{subfigure}
+  \caption{\small First row: matrix is nearly singular. Second row: condition number less than 200. Third row: K means based on the second row. The $\alpha$ values refers to Section \ref{sec:ridgre-regression-text}. }
+  \label{fig:two-different-images-for-4.1}
+\end{figure}
+
+The colours in Figure \ref{fig:two-different-images-for-4.1} in the last row are calculated using K means where yellow is iron and green is bismuth. 
+
+In Figure \ref{fig:two-different-images-for-4.1} the first row was generated using 16 rays and 36 angles uniformly distributed in the interval $[1,180]$. The second row was generated using 48 rays and all integer angels in the interval $[1, 180]$. 
 
 \subsection{Energy usage}\label{sec:energy-usage}
 Based on the data described in section \ref{NISTDATA} we created the following plots (Figure \ref{fig:both-attenuation-coeff-plots}).
@@ -321,23 +339,17 @@ Based on the data described in section \ref{NISTDATA} we created the following p
 
 \noindent Based on Figure \ref{fig:both-attenuation-coeff-plots} we see that the best configuration for the X-Ray for noticing a difference between wood, bismuth and iron is at 16.4 keV. We also note that the best configuration for noticing a difference between wood and iron is at 10 keV.  
 
-Using Lambert Beer's law we also created the following plot which shows the ratio between input and output energy intensities depending on different energy levels (Figure \ref{fig:energy-vs-output-percentage}.). 
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.35]{images/energy-vs-output-percentage.png}
-    \caption{The ratio between energy intensities as a function of the energy level measured in keV.}
-    \label{fig:energy-vs-output-percentage}
-\end{figure}
-
 \section{Discussion}
 To reconstruct an image from the attenuation distributions by a CT-scanner well enough to spot some detail, in this case shots in logs, there are a lot of parameters that can be tuned and approximations to be made. The specific approximations and simplifications to make is a model specific task and all come with tradeoffs. 
 
 % Bedre formuleringer for dette afsnit eksisterer helt klart
-In Section \ref{sec:energy-usage} we saw that configuring the X-Ray to use 16.4 keV was the optimal energy level for differentiating between iron and bismuth using data from NIST. This however assumed that wood is completely homogeneous and therefore, before using the system in the "real" world, a better value could be found by trying different energy levels in a concrete example and then deciding on a value.
+In Section \ref{sec:energy-usage} we saw that configuring the X-Ray to use 16.4 keV was the optimal energy level for differentiating between iron and bismuth using data from NIST. This however assumed that wood is completely homogeneous. Therefore, before using the system in the "real" world, a better value could be found by trying different energy levels in a concrete example and then deciding on a value.
+
+Due to the variability of the actual pixel values in a reconstructed image, the utilization of k-means clustering enables a system to effectively identify the location of the pellets, as the class label of the given pixel.
+
 
 \section{Conclude}
-???
+This project provides a complete and automatic Python implementation for reconstructing the insides of a log with one or more embedded bismuth and steel shots, when given noisy attenuation distributions as outputted by a CT-scanner. It automatically assigns the label, i.e. whether it is air, wood, steel, or bismuth, of every pixel on the image with a given resolution and 
 
 
 \section{References}
@@ -450,5 +462,51 @@ All code can also be found on GitHub \url{https://github.com/ElMiho/02526-exam-p
 
 \subsection{Code related to \ref{sec:num-rays-angles-resolution}}\label{appendix:num-rays-angles-resolution}
 \lstinputlisting[language=Python, breaklines=true]{code/number_of_rays_angles_and_resolution.py}
+
+\section{Plots and various conclusions}
+\subsection{Lambert beer and intensity}
+Using Lambert Beer's law we also created the following plot which shows the ratio between input and output energy intensities depending on different energy levels (Figure \ref{fig:energy-vs-output-percentage}.). 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.35]{images/energy-vs-output-percentage.png}
+    \caption{The ratio between energy intensities as a function of the energy level measured in keV.}
+    \label{fig:energy-vs-output-percentage}
+\end{figure}
+
+\subsection{DTU Plot}
+The following illustration was made for demonstration purposes, the pixel values are equivalent to those found in the given test-image:
+\begin{figure}[H]
+\centering
+\begin{subfigure}[t]{0.3\linewidth}
+\centering
+\includegraphics[width=\linewidth]{code/test_logo.png}
+\end{subfigure}
+\begin{subfigure}[t]{0.4\linewidth}
+\centering
+\includegraphics[width=\linewidth]{code/test_logo_recov.png}
+\end{subfigure}
+\begin{subfigure}[t]{0.5\linewidth}
+\centering
+\includegraphics[width=\linewidth]{code/test_logo_kmeans.png}
+\end{subfigure}
+
+\vspace{10pt}
+
+\begin{tikzpicture}[overlay, remember picture, <->,>=stealth, shorten <=2pt, shorten >=2pt]
+% Arrow 1
+\draw[->, very thick] (-1.5,8) to (0.5,8.6);
+\node[above, rotate=17, font=\footnotesize] at (-0.77,8.15) {No Noise};
+\node[above, rotate=17, font=\footnotesize] at (-0.5,7.9) {Reconstruct};
+
+% Arrow 2
+\draw[->, very thick] (2.5,6.75) to (0,5.9);
+\node[above, rotate=18.77, font=\footnotesize] at (1.1,6.25) {Add Noise};
+\node[above, rotate=18.77, font=\footnotesize] at (1.35,5.95) {Reconstruct};
+\end{tikzpicture}
+\label{fig:front_page}
+\end{figure}
+
+The noise level added was about $0.0001$, corresponding to about $1-10 \%$ of the average value. Ridge regression was used with $\alpha = 40$, so as to reduce the effect of noise as much as possible.
 
 \end{document}
